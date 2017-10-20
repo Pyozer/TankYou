@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">TankYou</string>
+
+    <string name="field_required">Champs de texte obligatoire.</string>
+
+    <string name="button_start">Commencer</string>
+    <string name="input_pseudo">Pseudo</string>
+
+    <string name="no_pseudo_get">Pas de pseudo transmis !</string>
+
+    <string name="alert_no_sensor_title">Capteur manquant</string>
+    <string name="alert_no_compass_message">Le capteur de la boussole n\'a pas été trouvé !</string>
+    <string name="alert_no_accelerometer_message">Votre téléphone ne possède pas d\'accéléromètre…</string>
+</resources>
