@@ -57,7 +57,7 @@ public class CapteurManager implements SensorEventListener {
 
             float newDegree = Math.round(values[0]);
 
-            context.updateTankOrientation(degree, newDegree);
+            //context.updateTankOrientation(degree, newDegree);
 
             degree = newDegree;
         } else if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
@@ -67,7 +67,7 @@ public class CapteurManager implements SensorEventListener {
             else if(values[1] < valueRef - 1)
                 speed = -2;
 
-            context.updateTankPosition(-speed);
+            //context.updateTankPosition(-speed, degree);
         }
     }
 

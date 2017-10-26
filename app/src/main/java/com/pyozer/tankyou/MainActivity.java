@@ -22,12 +22,12 @@ public class MainActivity extends BaseActivity {
         mButtonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                goToRoom();
+                goToGame();
             }
         });
     }
 
-    private void goToRoom() {
+    private void goToGame() {
         mInputPseudo.setError(null);
 
         String pseudo = mInputPseudo.getText().toString().trim();
@@ -35,7 +35,7 @@ public class MainActivity extends BaseActivity {
         if(TextUtils.isEmpty(pseudo)) {
             mInputPseudo.setError(getString(R.string.field_required));
         } else {
-            Intent intent = new Intent(this, RoomActivity.class);
+            Intent intent = new Intent(this, GameActivity.class);
             intent.putExtra(AppConfig.EXTRA_PSEUDO, pseudo);
             startActivity(intent);
         }
