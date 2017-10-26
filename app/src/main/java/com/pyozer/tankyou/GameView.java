@@ -29,6 +29,7 @@ public class GameView extends FrameLayout implements SensorEventListener {
     private final Tank mTank;
 
     private boolean tankAlreadyOnTarget = false;
+    private boolean alreadyShowWin = false;
 
     public void startSimulation() {
         mContext.mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
@@ -106,8 +107,11 @@ public class GameView extends FrameLayout implements SensorEventListener {
     @Override
     protected void onDraw(Canvas canvas) {
         if (tankAlreadyOnTarget || isTankOnTarget(mTank.mPosX, mTank.mPosY)) {
-            stopSimulation();
-            mContext.showAlertDialog("Bravo", "Tu as atteint ta cible !");
+            if(!alreadyShowWin) {
+                stopSimulation();
+                mContext.showAlertDialog("Bravo", "Tu as atteint ta cible !");
+                alreadyShowWin = true;
+            }
         } else {
 
             float oldDegre = mTank.mDegre;

@@ -42,7 +42,7 @@ public class GameActivity extends Activity {
 
         // instantiate our simulation view and set it as the activity's content
         mSimulationView = new GameView(this);
-        mSimulationView.setBackgroundResource(R.drawable.wood);
+        mSimulationView.setBackgroundResource(R.drawable.background_game);
         setContentView(mSimulationView);
     }
 
