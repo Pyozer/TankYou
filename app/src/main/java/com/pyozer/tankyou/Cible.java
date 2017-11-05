@@ -9,10 +9,4 @@ public class Cible extends Objet {
         mPosX = 800;
         mPosY = 1300;
     }
-
-    @Override
-    public void resolveCollisionWithBounds(float mHorizontalBound, float mVerticalBound) {
-        //Nothing
-    }
-
 }

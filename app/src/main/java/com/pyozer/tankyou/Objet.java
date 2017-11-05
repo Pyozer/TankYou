@@ -12,14 +12,6 @@ public abstract class Objet extends View {
         super(context);
     }
 
-    /*
-     * Resolving constraints and collisions with the Verlet integrator
-     * can be very simple, we simply need to move a colliding or
-     * constrained particle in such way that the constraint is
-     * satisfied.
-     */
-    public abstract void resolveCollisionWithBounds(float mHorizontalBound, float mVerticalBound);
-
     @Override
     public void setX(float x) {
       mPosX = x;

@@ -10,12 +10,12 @@ import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Surface;
 import android.view.ViewGroup;
 import android.view.animation.RotateAnimation;
 import android.widget.FrameLayout;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -24,9 +24,8 @@ public class GameView extends FrameLayout implements SensorEventListener {
     private final GameActivity mContext;
     private Sensor mAccelerometer;
     private Sensor mCompass;
+
     private boolean isFirstCompassChanged = true;
-    private boolean isFirstAccelChanged = true;
-    private float mSensorYCalibre;
     private float mSensorDegreeCalibre;
 
     private float mSensorY;
@@ -116,31 +115,25 @@ public class GameView extends FrameLayout implements SensorEventListener {
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
             if(isFirstCompassChanged) {
-                mSensorDegreeCalibre = event.values[0];
+                mSensorDegreeCalibre = event.values[0] + 90;
                 isFirstCompassChanged = false;
             }
             mSensorDegree = event.values[0] - mSensorDegreeCalibre;
         } else if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            if(isFirstAccelChanged) {
-                mSensorYCalibre = -event.values[1];
-                isFirstAccelChanged = false;
-            }
+            mSensorY = -event.values[1];
 
-            mSensorY = -event.values[1] - mSensorYCalibre;
-
-            if (mSensorY > 1) {
+            if (mSensorY > 1.3) {
                 mSensorY = 5;
-            } else if (mSensorY < -1) {
+            } else if (mSensorY < -1.3) {
                 mSensorY = -5;
             } else {
                 mSensorY = 0;
             }
 
             if(mSensorY == 5 || mSensorY == -5) {
-                if(!soundTankMove.isPlaying())
-                    soundTankMove.start();
+                //TODO: ACTIVE SOUND
             } else {
-                soundTankMove.stop();
+                //TODO: DESACTIVE SOUND
             }
         }
     }
@@ -155,11 +148,18 @@ public class GameView extends FrameLayout implements SensorEventListener {
         } else {
             // On vérifie si le tank ne touche pas un des obstacles
             boolean touchObstacle = false;
-            for(Obstacle obstacle : mObstacles) {
-                obstacle.setTranslationY(++obstacle.mPosY);
-                touchObstacle = isTankOnObstacle(obstacle);
-                if(touchObstacle)
-                    break;
+            for(Iterator<Obstacle> iterator = mObstacles.iterator(); iterator.hasNext(); ) {
+                Obstacle obstacle = iterator.next();
+                obstacle.mPosY += obstacle.mVitesse;
+                obstacle.setTranslationY(obstacle.mPosY);
+                if(obstacle.isOutOfScreen(mVerticalMax)) {
+                    removeView(obstacle);
+                    iterator.remove();
+                } else {
+                    touchObstacle = isTankOnObstacle(obstacle);
+                    if(touchObstacle)
+                        break;
+                }
             }
             // Si le tank touche un obstacle
             if (tankAlreadyOnObstacle || touchObstacle) {
