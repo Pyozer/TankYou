@@ -60,6 +60,19 @@ public class GameActivity extends BaseActivity {
         mSimulationView.startSimulation();
     }
 
+    public void redirectGameWin() {
+        redirectGameEnd(true);
+    }
+
+    public void redirectGameLose() {
+        redirectGameEnd(false);
+    }
+    private void redirectGameEnd(boolean isGameWin) {
+        Intent endGame = new Intent(this, EndGameActivity.class);
+        endGame.putExtra("isUserWin", isGameWin);
+        startActivity(endGame);
+    }
+
     @Override
     protected void onPause() {
         super.onPause();

@@ -7,6 +7,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaPlayer;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Surface;
@@ -23,6 +24,10 @@ public class GameView extends FrameLayout implements SensorEventListener {
     private final GameActivity mContext;
     private Sensor mAccelerometer;
     private Sensor mCompass;
+    private boolean isFirstCompassChanged = true;
+    private boolean isFirstAccelChanged = true;
+    private float mSensorYCalibre;
+    private float mSensorDegreeCalibre;
 
     private float mSensorY;
     private float mSensorDegree;
@@ -35,8 +40,7 @@ public class GameView extends FrameLayout implements SensorEventListener {
 
     private boolean tankAlreadyOnTarget = false;
     private boolean tankAlreadyOnObstacle = false;
-    private boolean alreadyShowWin = false;
-    private boolean alreadyShowLose = false;
+    private MediaPlayer soundTankMove;
 
     private long lastTime = System.currentTimeMillis();
 
@@ -76,6 +80,8 @@ public class GameView extends FrameLayout implements SensorEventListener {
         BitmapFactory.Options opts = new BitmapFactory.Options();
         opts.inDither = true;
         opts.inPreferredConfig = Bitmap.Config.RGB_565;
+
+        soundTankMove = MediaPlayer.create(getContext(), R.raw.tank_move);
     }
 
     private void createNewObstacle() {
@@ -109,37 +115,43 @@ public class GameView extends FrameLayout implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
-            mSensorDegree = event.values[0];
+            if(isFirstCompassChanged) {
+                mSensorDegreeCalibre = event.values[0];
+                isFirstCompassChanged = false;
+            }
+            mSensorDegree = event.values[0] - mSensorDegreeCalibre;
         } else if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            switch (mContext.mDisplay.getRotation()) {
-                case Surface.ROTATION_0:
-                    mSensorY = -event.values[1];
-                    break;
-                case Surface.ROTATION_90:
-                    mSensorY = -event.values[0];
-                    break;
-                case Surface.ROTATION_180:
-                    mSensorY = +event.values[1];
-                    break;
-                case Surface.ROTATION_270:
-                    mSensorY = +event.values[0];
-                    break;
+            if(isFirstAccelChanged) {
+                mSensorYCalibre = -event.values[1];
+                isFirstAccelChanged = false;
             }
 
-            if (mSensorY > 1) mSensorY = 5;
-            else if (mSensorY < -1) mSensorY = -5;
-            else mSensorY = 0;
+            mSensorY = -event.values[1] - mSensorYCalibre;
+
+            if (mSensorY > 1) {
+                mSensorY = 5;
+            } else if (mSensorY < -1) {
+                mSensorY = -5;
+            } else {
+                mSensorY = 0;
+            }
+
+            if(mSensorY == 5 || mSensorY == -5) {
+                if(!soundTankMove.isPlaying())
+                    soundTankMove.start();
+            } else {
+                soundTankMove.stop();
+            }
         }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         if (tankAlreadyOnTarget || isTankOnTarget()) {
-            if(!alreadyShowWin) {
-                stopSimulation();
-                mContext.showAlertDialog("Bravo", "Tu as atteint ta cible !");
-                alreadyShowWin = true;
-            }
+            MediaPlayer mp = MediaPlayer.create(getContext(), R.raw.win);
+            mp.start();
+            stopSimulation();
+            mContext.redirectGameWin();
         } else {
             // On vérifie si le tank ne touche pas un des obstacles
             boolean touchObstacle = false;
@@ -151,11 +163,10 @@ public class GameView extends FrameLayout implements SensorEventListener {
             }
             // Si le tank touche un obstacle
             if (tankAlreadyOnObstacle || touchObstacle) {
-                if(!alreadyShowLose) {
-                    stopSimulation();
-                    mContext.showAlertDialog("Perdu", "Vous avez toucher un obstacle :/");
-                    alreadyShowLose = true;
-                }
+                MediaPlayer mp = MediaPlayer.create(getContext(), R.raw.explosion);
+                mp.start();
+                stopSimulation();
+                mContext.redirectGameLose();
             } else {
                 // Sinon si il touche rien
                 long currentTime = System.currentTimeMillis();
