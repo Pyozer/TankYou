@@ -11,7 +11,7 @@ import android.os.PowerManager.WakeLock;
 import android.view.Display;
 import android.view.WindowManager;
 
-public class GameActivity extends Activity {
+public class GameActivity extends BaseActivity {
 
     private GameView mSimulationView;
     public SensorManager mSensorManager;
@@ -46,27 +46,6 @@ public class GameActivity extends Activity {
         setContentView(mSimulationView);
     }
 
-    protected void showAlertDialog(String title, String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(title);
-        builder.setMessage(message);
-
-        builder.setCancelable(false);
-
-        String positiveText = getString(android.R.string.ok);
-        builder.setPositiveButton(positiveText, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                startActivity(new Intent(GameActivity.this, GameActivity.class));
-                finish();
-            }
-        });
-
-        AlertDialog dialog = builder.create();
-        // display dialog
-        dialog.show();
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -75,7 +54,7 @@ public class GameActivity extends Activity {
          * screen stays on, since the user will likely not be fiddling with the
          * screen or buttons.
          */
-        mWakeLock.acquire();
+        mWakeLock.acquire(10*60*1000L /*10 minutes*/);
 
         // Start the simulation
         mSimulationView.startSimulation();

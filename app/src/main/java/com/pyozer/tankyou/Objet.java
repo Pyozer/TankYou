@@ -5,8 +5,8 @@ import android.view.View;
 
 public abstract class Objet extends View {
 
-    float mPosX = 500;
-    float mPosY = 500;
+    float mPosX;
+    float mPosY;
 
     public Objet(Context context) {
         super(context);
@@ -18,16 +18,17 @@ public abstract class Objet extends View {
      * constrained particle in such way that the constraint is
      * satisfied.
      */
-    public void resolveCollisionWithBounds(float mHorizontalBound, float mVerticalBound) {
-        if (mPosX > mHorizontalBound - getWidth()) {
-            mPosX = mHorizontalBound - getWidth();
-        } else if (mPosX < 0) {
-            mPosX = 0;
-        }
-        if (mPosY > mVerticalBound - getHeight()) {
-            mPosY = mVerticalBound - getHeight();
-        } else if (mPosY < 0) {
-            mPosY = 0;
-        }
+    public abstract void resolveCollisionWithBounds(float mHorizontalBound, float mVerticalBound);
+
+    @Override
+    public void setX(float x) {
+      mPosX = x;
+      super.setX(mPosX);
+    }
+
+    @Override
+    public void setY(float y) {
+        mPosY = y;
+        super.setY(mPosY);
     }
 }
