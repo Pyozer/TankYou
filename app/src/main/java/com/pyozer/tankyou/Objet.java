@@ -10,6 +10,7 @@ public abstract class Objet extends View {
 
     public Objet(Context context) {
         super(context);
+        setLayerType(LAYER_TYPE_HARDWARE, null);
     }
 
     @Override

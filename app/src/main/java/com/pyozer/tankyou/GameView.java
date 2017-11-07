@@ -9,7 +9,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.util.DisplayMetrics;
-import android.util.Log;
+import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.animation.RotateAnimation;
 import android.widget.FrameLayout;
@@ -33,11 +33,10 @@ public class GameView extends FrameLayout implements SensorEventListener {
     private float mHorizontalMax;
     private float mVerticalMax;
 
-    private Cible mCible;
     private Tank mTank;
     private List<Obstacle> mObstacles;
+    private List<Missile> mMissiles;
 
-    private boolean tankAlreadyOnTarget = false;
     private boolean tankAlreadyOnObstacle = false;
     private MediaPlayer soundTankMove;
 
@@ -66,15 +65,11 @@ public class GameView extends FrameLayout implements SensorEventListener {
         mHorizontalMax = metrics.widthPixels;
         mVerticalMax = metrics.heightPixels;
 
-        mCible = new Cible(getContext());
-        mCible.setLayerType(LAYER_TYPE_HARDWARE, null);
-        addView(mCible, new ViewGroup.LayoutParams(200, 200));
-
         mTank = new Tank(getContext());
-        mTank.setLayerType(LAYER_TYPE_HARDWARE, null);
         addView(mTank, new ViewGroup.LayoutParams(175, 150));
 
         mObstacles = new ArrayList<>();
+        mMissiles = new ArrayList<>();
 
         BitmapFactory.Options opts = new BitmapFactory.Options();
         opts.inDither = true;
@@ -85,7 +80,6 @@ public class GameView extends FrameLayout implements SensorEventListener {
 
     private void createNewObstacle() {
         Obstacle obstacle = new Obstacle(getContext());
-        obstacle.setLayerType(LAYER_TYPE_HARDWARE, null);
         addView(obstacle, new ViewGroup.LayoutParams(110, 110));
 
         int xRand = randInt((int) mHorizontalMax - obstacle.getWidth());
@@ -108,22 +102,35 @@ public class GameView extends FrameLayout implements SensorEventListener {
         mObstacles.add(obstacle);
     }
 
+    private void createNewRocket() {
+        Missile missile = new Missile(getContext(), mSensorDegree);
+        addView(missile, new ViewGroup.LayoutParams(50, 50));
+
+        missile.setBackgroundResource(R.drawable.missile);
+        missile.setX(mTank.mPosX + mTank.getWidth() / 2);
+        missile.setY(mTank.mPosY + mTank.getHeight() / 2);
+        mMissiles.add(missile);
+    }
+
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
 
-        mCible.setX(randInt((int) mHorizontalMax - mCible.getWidth()));
-        mCible.setY(mCible.getHeight() / 2);
-
         mTank.setX(mHorizontalMax / 2 - mTank.getWidth() / 2);
         mTank.setY(mVerticalMax / 2 - mTank.getHeight() / 2);
 
-        mCible.setBackgroundResource(R.drawable.cible);
         mTank.setBackgroundResource(R.drawable.tanks_sprites_blue);
     }
 
     private int randInt(int max) {
         return new Random().nextInt(max);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        createNewRocket();
+
+        return super.onTouchEvent(event);
     }
 
     @Override
@@ -155,58 +162,74 @@ public class GameView extends FrameLayout implements SensorEventListener {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (tankAlreadyOnTarget || isTankOnTarget()) {
-            MediaPlayer mp = MediaPlayer.create(getContext(), R.raw.win);
+        // On vérifie si le tank ne touche pas un des obstacles
+        boolean touchObstacle = false;
+        for(Iterator<Obstacle> iterator = mObstacles.iterator(); iterator.hasNext(); ) {
+            Obstacle obstacle = iterator.next();
+            obstacle.updatePosObstacle();
+            obstacle.setTranslationX(obstacle.mPosX);
+            obstacle.setTranslationY(obstacle.mPosY);
+
+            if(obstacle.isOutOfScreen(mHorizontalMax, mVerticalMax)) {
+                removeView(obstacle);
+                iterator.remove();
+            } else {
+                touchObstacle = isTankOnObstacle(obstacle);
+                if(touchObstacle)
+                    break;
+            }
+        }
+        //On bouge les missiles et check si ils touchent un obstacle
+        for(Iterator<Missile> iterator = mMissiles.iterator(); iterator.hasNext(); ) {
+            Missile missile = iterator.next();
+            missile.updatePosMissile();
+            missile.setTranslationX(missile.mPosX);
+            missile.setTranslationY(missile.mPosY);
+
+            if(missile.isOutOfScreen(mHorizontalMax, mVerticalMax)) {
+                removeView(missile);
+                iterator.remove();
+            } else {
+                for(Iterator<Obstacle> iteratorObstacle = mObstacles.iterator(); iteratorObstacle.hasNext(); ) {
+                    Obstacle obstacle = iteratorObstacle.next();
+                    if(isMissileOnObstacle(missile, obstacle)) {
+                        removeView(obstacle);
+                        iteratorObstacle.remove();
+                        removeView(missile);
+                        iterator.remove();
+                    }
+                }
+            }
+        }
+
+        // Si le tank touche un obstacle
+        if (tankAlreadyOnObstacle || touchObstacle) {
+            MediaPlayer mp = MediaPlayer.create(getContext(), R.raw.explosion);
             mp.start();
             stopSimulation();
-            mContext.showGameWin();
+            mContext.showGameLose();
         } else {
-            // On vérifie si le tank ne touche pas un des obstacles
-            boolean touchObstacle = false;
-            for(Iterator<Obstacle> iterator = mObstacles.iterator(); iterator.hasNext(); ) {
-                Obstacle obstacle = iterator.next();
-                obstacle.updatePosObstacle();
-                obstacle.setTranslationX(obstacle.mPosX);
-                obstacle.setTranslationY(obstacle.mPosY);
+            // Sinon si il touche rien
+            long currentTime = System.currentTimeMillis();
+            float oldDegre = mTank.mDegre;
 
-                if(obstacle.isOutOfScreen(mHorizontalMax, mVerticalMax)) {
-                    removeView(obstacle);
-                    iterator.remove();
-                } else {
-                    touchObstacle = isTankOnObstacle(obstacle);
-                    if(touchObstacle)
-                        break;
-                }
+            mTank.computePhysics(mSensorY, mSensorDegree);
+
+            long deltaTime = (currentTime - lastTime);
+            if(deltaTime >= 1500) { // On créer un obstacle toute les 1.5sec
+                createNewObstacle();
+                lastTime = currentTime;
             }
-            // Si le tank touche un obstacle
-            if (tankAlreadyOnObstacle || touchObstacle) {
-                MediaPlayer mp = MediaPlayer.create(getContext(), R.raw.explosion);
-                mp.start();
-                stopSimulation();
-                mContext.showGameLose();
-            } else {
-                // Sinon si il touche rien
-                long currentTime = System.currentTimeMillis();
-                float oldDegre = mTank.mDegre;
 
-                mTank.computePhysics(mSensorY, mSensorDegree);
+            mTank.resolveCollisionWithBounds(mHorizontalMax, mVerticalMax);
 
-                long deltaTime = (currentTime - lastTime);
-                if(deltaTime >= 1500) { // On créer un obstacle toute les 1.5sec
-                    createNewObstacle();
-                    lastTime = currentTime;
-                }
+            mTank.setTranslationX(mTank.mPosX);
+            mTank.setTranslationY(mTank.mPosY);
 
-                mTank.resolveCollisionWithBounds(mHorizontalMax, mVerticalMax);
+            updateTankOrientation(oldDegre, mTank.mDegre);
 
-                mTank.setTranslationX(mTank.mPosX);
-                mTank.setTranslationY(mTank.mPosY);
-
-                updateTankOrientation(oldDegre, mTank.mDegre);
-
-                // and make sure to redraw asap
-                invalidate();
-            }
+            // and make sure to redraw asap
+            invalidate();
         }
     }
 
@@ -221,29 +244,68 @@ public class GameView extends FrameLayout implements SensorEventListener {
         mTank.startAnimation(rotateAnimation);
     }
 
-    public boolean isTankOnTarget() {
-        if (mCible.mPosX < mTank.mPosX + mTank.getWidth() / 2
-                && mCible.mPosX + mCible.getWidth() > mTank.mPosX + mTank.getWidth() / 2
-                && mCible.mPosY < mTank.mPosY + mTank.getHeight() / 2
-                && mCible.mPosY + mCible.getHeight() > mTank.mPosY + mTank.getHeight() / 2) {
-
-            // si le tank vient de rentrer dans la cible
-            tankAlreadyOnTarget = true;
-            return true;
-        }
-        return false;
-    }
-
     public boolean isTankOnObstacle(Obstacle obstacle) {
-        if(mTank.mPosX < obstacle.mPosX + obstacle.getWidth()
-                && mTank.mPosX + mTank.getWidth() > obstacle.mPosX
-                && mTank.mPosY < obstacle.mPosY + obstacle.getHeight()
-                && mTank.getHeight() + mTank.mPosY > obstacle.mPosY) {
+        // Rotate circle's center point back
+        float obstacleCenterX = obstacle.mPosX + obstacle.getWidth() / 2;
+        float obstacleCenterY = obstacle.mPosY + obstacle.getHeight() / 2;
 
+        float tankCenterX = mTank.mPosX + mTank.getWidth() / 2;
+        float tankCenterY = mTank.mPosY + mTank.getHeight() / 2;
+
+        double unrotatedCircleX = Math.cos(Math.toRadians(mTank.mDegre)) * (obstacleCenterX - tankCenterX) -
+                Math.sin(Math.toRadians(mTank.mDegre)) * (obstacleCenterY - tankCenterY) + tankCenterX;
+        double unrotatedCircleY  = Math.sin(Math.toRadians(mTank.mDegre)) * (obstacleCenterX - tankCenterX) +
+                Math.cos(Math.toRadians(mTank.mDegre)) * (obstacleCenterY - tankCenterY) + tankCenterY;
+
+        // Closest point in the rectangle to the center of circle rotated backwards(unrotated)
+        double closestX, closestY;
+
+        // Find the unrotated closest x point from center of unrotated circle
+        if (unrotatedCircleX  < mTank.mPosX)
+            closestX = mTank.mPosX;
+        else if (unrotatedCircleX  > mTank.mPosX + mTank.getWidth())
+            closestX = mTank.mPosX + mTank.getWidth();
+        else
+            closestX = unrotatedCircleX ;
+
+        // Find the unrotated closest y point from center of unrotated circle
+        if (unrotatedCircleY < mTank.mPosY)
+            closestY = mTank.mPosY;
+        else if (unrotatedCircleY > mTank.mPosY + mTank.getHeight())
+            closestY = mTank.mPosY + mTank.getHeight();
+        else
+            closestY = unrotatedCircleY;
+
+        double distance = findDistance(unrotatedCircleX , unrotatedCircleY, closestX, closestY);
+        if (distance < obstacle.getWidth() / 2) {
             tankAlreadyOnObstacle = true;
             return true;
+        } else {
+            return false;
         }
-        return false;
+    }
+
+    public double findDistance(double fromX, double fromY, double toX, double toY){
+        double a = Math.abs(fromX - toX);
+        double b = Math.abs(fromY - toY);
+
+        return Math.sqrt((a * a) + (b * b));
+    }
+
+    public boolean isMissileOnObstacle(Missile missile, Obstacle obstacle) {
+        float missileRadius = missile.getWidth() / 2;
+        float obstacleRadius = obstacle.getWidth() / 2;
+
+        float missileCenterX = missile.mPosX + missileRadius;
+        float missileCenterY = missile.mPosY + missileRadius;
+        float obstacleCenterX = obstacle.mPosX + obstacleRadius;
+        float obstacleCenterY = obstacle.mPosX + obstacleRadius;
+
+        float dx = missileCenterX - obstacleCenterX;
+        float dy = missileCenterY - obstacleCenterY;
+        double distance = Math.sqrt(dx * dx + dy * dy);
+
+        return distance < missileRadius + obstacleRadius;
     }
 
     @Override
