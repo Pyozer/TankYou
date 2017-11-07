@@ -115,8 +115,8 @@ public class GameView extends FrameLayout implements SensorEventListener {
         mCible.setX(randInt((int) mHorizontalMax - mCible.getWidth()));
         mCible.setY(mCible.getHeight() / 2);
 
-        mTank.setX(mHorizontalMax / 2);
-        mTank.setY(mVerticalMax / 2);
+        mTank.setX(mHorizontalMax / 2 - mTank.getWidth() / 2);
+        mTank.setY(mVerticalMax / 2 - mTank.getHeight() / 2);
 
         mCible.setBackgroundResource(R.drawable.cible);
         mTank.setBackgroundResource(R.drawable.tanks_sprites_blue);
