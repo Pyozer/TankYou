@@ -60,17 +60,31 @@ public class GameActivity extends BaseActivity {
         mSimulationView.startSimulation();
     }
 
-    public void redirectGameWin() {
-        redirectGameEnd(true);
+    public void showGameWin() {
+        showGameEnd(true);
     }
 
-    public void redirectGameLose() {
-        redirectGameEnd(false);
+    public void showGameLose() {
+        showGameEnd(false);
     }
-    private void redirectGameEnd(boolean isGameWin) {
-        Intent endGame = new Intent(this, EndGameActivity.class);
-        endGame.putExtra("isUserWin", isGameWin);
-        startActivity(endGame);
+    private void showGameEnd(boolean isGameWin) {
+        AlertDialog.Builder builder;
+        builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
+
+        builder.setTitle("Vous avez " + ((isGameWin) ? "gagné" : "perdu") + " !")
+                .setMessage("Voulez-vous recommencer ?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // continue with delete
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .show();
     }
 
     @Override

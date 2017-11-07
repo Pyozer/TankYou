@@ -87,8 +87,23 @@ public class GameView extends FrameLayout implements SensorEventListener {
         Obstacle obstacle = new Obstacle(getContext());
         obstacle.setLayerType(LAYER_TYPE_HARDWARE, null);
         addView(obstacle, new ViewGroup.LayoutParams(110, 110));
-        obstacle.setX(randInt((int) mHorizontalMax - obstacle.getWidth()));
-        obstacle.setY(0);
+
+        int xRand = randInt((int) mHorizontalMax - obstacle.getWidth());
+        int yRand = randInt((int) mVerticalMax - obstacle.getHeight());
+
+        if (obstacle.orientationNum == 1) { // FROM_TOP
+            obstacle.setX(xRand);
+            obstacle.setY(-obstacle.getHeight());
+        } else if (obstacle.orientationNum == 2) { // FROM_RIGHT
+            obstacle.setX(mHorizontalMax);
+            obstacle.setY(yRand);
+        } else if (obstacle.orientationNum == 3) { // FROM_BOTTOM
+            obstacle.setX(xRand);
+            obstacle.setY(mVerticalMax);
+        } else if (obstacle.orientationNum == 4) { // FROM_LEFT
+            obstacle.setX(-obstacle.getWidth());
+            obstacle.setY(yRand);
+        }
         obstacle.setBackgroundResource(R.drawable.obstacle);
         mObstacles.add(obstacle);
     }
@@ -144,15 +159,17 @@ public class GameView extends FrameLayout implements SensorEventListener {
             MediaPlayer mp = MediaPlayer.create(getContext(), R.raw.win);
             mp.start();
             stopSimulation();
-            mContext.redirectGameWin();
+            mContext.showGameWin();
         } else {
             // On vérifie si le tank ne touche pas un des obstacles
             boolean touchObstacle = false;
             for(Iterator<Obstacle> iterator = mObstacles.iterator(); iterator.hasNext(); ) {
                 Obstacle obstacle = iterator.next();
-                obstacle.mPosY += obstacle.mVitesse;
+                obstacle.updatePosObstacle();
+                obstacle.setTranslationX(obstacle.mPosX);
                 obstacle.setTranslationY(obstacle.mPosY);
-                if(obstacle.isOutOfScreen(mVerticalMax)) {
+
+                if(obstacle.isOutOfScreen(mHorizontalMax, mVerticalMax)) {
                     removeView(obstacle);
                     iterator.remove();
                 } else {
@@ -166,7 +183,7 @@ public class GameView extends FrameLayout implements SensorEventListener {
                 MediaPlayer mp = MediaPlayer.create(getContext(), R.raw.explosion);
                 mp.start();
                 stopSimulation();
-                mContext.redirectGameLose();
+                mContext.showGameLose();
             } else {
                 // Sinon si il touche rien
                 long currentTime = System.currentTimeMillis();
@@ -223,7 +240,6 @@ public class GameView extends FrameLayout implements SensorEventListener {
                 && mTank.mPosY < obstacle.mPosY + obstacle.getHeight()
                 && mTank.getHeight() + mTank.mPosY > obstacle.mPosY) {
 
-            Log.e("COLLISION", "COLLISION DETECTE");
             tankAlreadyOnObstacle = true;
             return true;
         }
