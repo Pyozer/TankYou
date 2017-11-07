@@ -13,4 +13,13 @@
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
+    <!-- Separateur -->
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginRight">24dp</item>
+        <item name="android:layout_marginLeft">24dp</item>
+        <item name="android:background">@color/white</item>
+    </style>
+
 </resources>

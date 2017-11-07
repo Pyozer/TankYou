@@ -11,4 +11,10 @@
     <string name="alert_no_sensor_title">Capteur manquant</string>
     <string name="alert_no_compass_message">Le capteur de la boussole n\'a pas été trouvé !</string>
     <string name="alert_no_accelerometer_message">Votre téléphone ne possède pas d\'accéléromètre…</string>
+    <string name="jouer">Jouer</string>
+    <string name="scores">Scores</string>
+    <string name="rules">Règles</string>
+    <string name="about">A propos</string>
+    <string name="about_text">Application développé par Jean-Charles Moussé.</string>
+    <string name="a_propos_title">A PROPOS</string>
 </resources>

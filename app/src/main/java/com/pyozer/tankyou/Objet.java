@@ -24,4 +24,18 @@ public abstract class Objet extends View {
         mPosY = y;
         super.setY(mPosY);
     }
+
+    public boolean isOutOfScreen(float mHorizontalBound, float mVerticalBound) {
+        if (mPosX > mHorizontalBound) {
+            return true;
+        } else if (mPosX < 0) {
+            return true;
+        }
+        if (mPosY > mVerticalBound) {
+            return true;
+        } else if (mPosY < 0) {
+            return true;
+        }
+        return false;
+    }
 }

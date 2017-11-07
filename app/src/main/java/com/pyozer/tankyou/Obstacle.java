@@ -47,18 +47,4 @@ public class Obstacle extends Objet {
         mPosY += orientation[1] * Math.sin(angleRadian) * mVitesse;
     }
 
-    public boolean isOutOfScreen(float mHorizontalBound, float mVerticalBound) {
-        if (mPosX > mHorizontalBound) {
-            return true;
-        } else if (mPosX < 0) {
-            return true;
-        }
-        if (mPosY > mVerticalBound) {
-            return true;
-        } else if (mPosY < 0) {
-            return true;
-        }
-        return false;
-    }
-
 }

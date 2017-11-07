@@ -1,43 +1,59 @@
 package com.pyozer.tankyou;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 
 public class MainActivity extends BaseActivity {
 
-    private EditText mInputPseudo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mInputPseudo = (EditText) findViewById(R.id.home_input_pseudo);
-
-        Button mButtonStart = (Button) findViewById(R.id.home_button_start);
-        mButtonStart.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.jouer).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                goToGame();
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, GameActivity.class));
+            }
+        });
+        findViewById(R.id.scores).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //startActivity(new Intent(MainActivity.this, ScoresActivity.class));
+            }
+        });
+        findViewById(R.id.rules).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //startActivity(new Intent(MainActivity.this, RulesActivity.class));
+            }
+        });
+        findViewById(R.id.about).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showAboutDialog();
             }
         });
     }
 
-    private void goToGame() {
-        mInputPseudo.setError(null);
+    private void showAboutDialog() {
+        final Dialog dialog = new Dialog(this);
 
-        String pseudo = mInputPseudo.getText().toString().trim();
+        dialog.setContentView(R.layout.about_dialog);
 
-        if(TextUtils.isEmpty(pseudo)) {
-            mInputPseudo.setError(getString(R.string.field_required));
-        } else {
-            Intent intent = new Intent(this, GameActivity.class);
-            intent.putExtra(AppConfig.EXTRA_PSEUDO, pseudo);
-            startActivity(intent);
-        }
+        /*Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
+        // if button is clicked, close the custom dialog
+        dialogButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });*/
+
+        dialog.show();
     }
+
 }

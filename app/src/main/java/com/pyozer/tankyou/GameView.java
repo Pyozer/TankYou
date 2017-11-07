@@ -3,16 +3,20 @@ package com.pyozer.tankyou;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.animation.RotateAnimation;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -38,9 +42,12 @@ public class GameView extends FrameLayout implements SensorEventListener {
     private List<Missile> mMissiles;
 
     private boolean tankAlreadyOnObstacle = false;
-    private MediaPlayer soundTankMove;
 
     private long lastTime = System.currentTimeMillis();
+    private long lastRocketFired;
+
+    private Paint paintWhite;
+    private int score = 0;
 
     public void startSimulation() {
         mContext.mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
@@ -75,7 +82,9 @@ public class GameView extends FrameLayout implements SensorEventListener {
         opts.inDither = true;
         opts.inPreferredConfig = Bitmap.Config.RGB_565;
 
-        soundTankMove = MediaPlayer.create(getContext(), R.raw.tank_move);
+        paintWhite = new Paint();
+        paintWhite.setColor(Color.WHITE);
+        paintWhite.setTextSize(60);
     }
 
     private void createNewObstacle() {
@@ -107,8 +116,8 @@ public class GameView extends FrameLayout implements SensorEventListener {
         addView(missile, new ViewGroup.LayoutParams(50, 50));
 
         missile.setBackgroundResource(R.drawable.missile);
-        missile.setX(mTank.mPosX + mTank.getWidth() / 2);
-        missile.setY(mTank.mPosY + mTank.getHeight() / 2);
+        missile.setX(mTank.mPosX + mTank.getWidth() / 2 - 25);
+        missile.setY(mTank.mPosY);
         mMissiles.add(missile);
     }
 
@@ -128,7 +137,11 @@ public class GameView extends FrameLayout implements SensorEventListener {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        createNewRocket();
+        long currentTime = System.currentTimeMillis();
+        if(currentTime - lastRocketFired > 2000) {
+            createNewRocket();
+            lastRocketFired = currentTime;
+        }
 
         return super.onTouchEvent(event);
     }
@@ -144,10 +157,10 @@ public class GameView extends FrameLayout implements SensorEventListener {
         } else if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             mSensorY = -event.values[1];
 
-            if (mSensorY > 1.3) {
-                mSensorY = 5;
-            } else if (mSensorY < -1.3) {
-                mSensorY = -5;
+            if (mSensorY > 1.1) {
+                mSensorY = 6.5f;
+            } else if (mSensorY < -1.1) {
+                mSensorY = -6.5f;
             } else {
                 mSensorY = 0;
             }
@@ -162,6 +175,7 @@ public class GameView extends FrameLayout implements SensorEventListener {
 
     @Override
     protected void onDraw(Canvas canvas) {
+
         // On vérifie si le tank ne touche pas un des obstacles
         boolean touchObstacle = false;
         for(Iterator<Obstacle> iterator = mObstacles.iterator(); iterator.hasNext(); ) {
@@ -197,10 +211,14 @@ public class GameView extends FrameLayout implements SensorEventListener {
                         iteratorObstacle.remove();
                         removeView(missile);
                         iterator.remove();
+
+                        score++;
                     }
                 }
             }
         }
+
+        canvas.drawText("Score: " + score, 10, 60, paintWhite);
 
         // Si le tank touche un obstacle
         if (tankAlreadyOnObstacle || touchObstacle) {
@@ -299,7 +317,7 @@ public class GameView extends FrameLayout implements SensorEventListener {
         float missileCenterX = missile.mPosX + missileRadius;
         float missileCenterY = missile.mPosY + missileRadius;
         float obstacleCenterX = obstacle.mPosX + obstacleRadius;
-        float obstacleCenterY = obstacle.mPosX + obstacleRadius;
+        float obstacleCenterY = obstacle.mPosY + obstacleRadius;
 
         float dx = missileCenterX - obstacleCenterX;
         float dy = missileCenterY - obstacleCenterY;
