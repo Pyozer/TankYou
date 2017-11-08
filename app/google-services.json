@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "399013487293-em5l4uthtrddko8k50t1sreiivotcpap.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pyozer.tankyou",
+            "certificate_hash": "68bd623ec4570d1f6ad80db4130bd8328d16b8ac"
+          }
+        },
+        {
           "client_id": "399013487293-ta9ea0bl1g4r77vj9e5faks7bb1kt4d3.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,8 +37,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "399013487293-ta9ea0bl1g4r77vj9e5faks7bb1kt4d3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2
