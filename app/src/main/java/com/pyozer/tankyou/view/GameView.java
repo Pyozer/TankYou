@@ -1,4 +1,4 @@
-package com.pyozer.tankyou;
+package com.pyozer.tankyou.view;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,12 +11,16 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.animation.RotateAnimation;
 import android.widget.FrameLayout;
-import android.widget.TextView;
+
+import com.pyozer.tankyou.R;
+import com.pyozer.tankyou.activity.GameActivity;
+import com.pyozer.tankyou.model.Missile;
+import com.pyozer.tankyou.model.Obstacle;
+import com.pyozer.tankyou.model.Tank;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -45,6 +49,7 @@ public class GameView extends FrameLayout implements SensorEventListener {
 
     private long lastTime = System.currentTimeMillis();
     private long lastRocketFired;
+    private long startGameTime;
 
     private Paint paintWhite;
     private int score = 0;
@@ -85,6 +90,8 @@ public class GameView extends FrameLayout implements SensorEventListener {
         paintWhite = new Paint();
         paintWhite.setColor(Color.WHITE);
         paintWhite.setTextSize(60);
+
+        startGameTime = System.currentTimeMillis();
     }
 
     private void createNewObstacle() {
@@ -219,13 +226,16 @@ public class GameView extends FrameLayout implements SensorEventListener {
         }
 
         canvas.drawText("Score: " + score, 10, 60, paintWhite);
+        int deltaTimeSec = Math.round((System.currentTimeMillis() - startGameTime) / 1000);
+        canvas.drawText("Time: " + deltaTimeSec + "sec", 10, 120, paintWhite);
 
         // Si le tank touche un obstacle
         if (tankAlreadyOnObstacle || touchObstacle) {
             MediaPlayer mp = MediaPlayer.create(getContext(), R.raw.explosion);
             mp.start();
             stopSimulation();
-            mContext.showGameLose();
+            int gameDuration = Math.round((System.currentTimeMillis() - startGameTime) / 1000);
+            mContext.showGameEnd(gameDuration, score);
         } else {
             // Sinon si il touche rien
             long currentTime = System.currentTimeMillis();

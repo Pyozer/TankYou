@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_rules"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/end_game_title"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.25"
+        android:layout_marginTop="60dp"
+        android:text="@string/end_game_title"
+        android:textColor="@color/white"
+        android:textAlignment="center"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Display2" />
+
+    <TextView
+        android:id="@+id/end_game_score"
+        android:layout_width="match_parent"
+        android:layout_weight="0.24"
+        android:layout_height="0dp"
+        android:textAlignment="center"
+        android:textSize="30sp"
+        style="@style/Base.TextAppearance.AppCompat.Large.Inverse" />
+
+    <TextView
+        android:id="@+id/end_game_duration"
+        android:layout_width="match_parent"
+        android:layout_weight="0.24"
+        android:layout_height="0dp"
+        android:textAlignment="center"
+        android:textSize="30sp"
+        style="@style/Base.TextAppearance.AppCompat.Large.Inverse" />
+
+    <Button
+        android:id="@+id/end_game_retry"
+        android:layout_width="match_parent"
+        android:layout_weight="0.145"
+        android:layout_height="0dp"
+        android:text="@string/end_game_retry"
+        android:textColor="@color/white"
+        android:background="@color/teal"/>
+
+    <Button
+        android:id="@+id/end_game_exit"
+        android:layout_width="match_parent"
+        android:layout_weight="0.145"
+        android:layout_height="0dp"
+        android:text="@string/end_game_menu"
+        android:textColor="@color/white"
+        android:background="@color/black_overlay"/>
+
+</LinearLayout>

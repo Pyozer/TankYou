@@ -1,4 +1,4 @@
-package com.pyozer.tankyou;
+package com.pyozer.tankyou.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,7 +16,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         // Hide the status bar.
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
-
     }
 
     @Override

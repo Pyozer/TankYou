@@ -5,8 +5,9 @@
     <color name="colorAccent">#e53935</color>
 
     <color name="background">#333</color>
+    <color name="backgroundLight">#393939</color>
     <color name="white">#ffffff</color>
     <color name="teal">#009688</color>
 
-    <color name="black_overlay">#66000000</color>
+    <color name="black_overlay">#7d000000</color>
 </resources>

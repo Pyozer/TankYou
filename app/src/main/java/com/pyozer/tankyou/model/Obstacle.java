@@ -1,9 +1,7 @@
-package com.pyozer.tankyou;
+package com.pyozer.tankyou.model;
 
 import android.content.Context;
-import android.util.Log;
 
-import java.util.Arrays;
 import java.util.Random;
 
 public class Obstacle extends Objet {
@@ -13,11 +11,11 @@ public class Obstacle extends Objet {
     public final static int[] FROM_LEFT = {1, 0};
     public final static int[] FROM_RIGHT = {-1, 0};
 
-    int[] orientation;
-    int orientationNum;
+    public int[] orientation;
+    public int orientationNum;
 
-    float mVitesse;
-    double angleRadian;
+    public float mVitesse;
+    public double angleRadian;
 
     public Obstacle(Context context) {
         super(context);

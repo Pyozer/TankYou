@@ -1,10 +1,10 @@
-package com.pyozer.tankyou;
+package com.pyozer.tankyou.model;
 
 import android.content.Context;
 
 public class Tank extends Objet {
 
-    float mDegre = 0;
+    public float mDegre = 0;
 
     public Tank(Context context) {
         super(context);

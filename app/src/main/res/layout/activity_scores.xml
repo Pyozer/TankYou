@@ -5,8 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    android:padding="@dimen/default_margin"
-    tools:context="com.pyozer.tankyou.ScoresActivity">
+    android:paddingBottom="@dimen/default_margin"
+    android:paddingTop="@dimen/default_margin"
+    tools:context="com.pyozer.tankyou.activity.ScoresActivity">
 
     <TextView
         android:id="@+id/scores_title"
@@ -27,16 +28,56 @@
         android:layout_alignBottom="@+id/scores_title"
         android:layout_alignParentStart="true"
         android:background="@android:color/transparent"
+        android:layout_marginStart="@dimen/default_margin"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_arrow_back_white_24dp" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/scores_list"
+    <LinearLayout
+        android:id="@+id/scores_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="34dp"
         android:layout_below="@id/scores_title"
+        android:background="@color/backgroundLight">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="0.75"
+            android:layout_height="wrap_content"
+            android:text="@string/scores_user"
+            android:paddingTop="@dimen/default_margin"
+            android:paddingBottom="@dimen/default_margin"
+            android:paddingStart="@dimen/default_margin"
+            android:paddingEnd="8dp"
+            style="@style/Base.TextAppearance.AppCompat.Small.Inverse" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="0.25"
+            android:layout_height="wrap_content"
+            android:text="@string/scores_points"
+            android:paddingTop="@dimen/default_margin"
+            android:paddingBottom="@dimen/default_margin"
+            android:paddingStart="8dp"
+            android:paddingEnd="@dimen/default_margin"
+            style="@style/Base.TextAppearance.AppCompat.Small.Inverse" />
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/scores_loader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/scores_header"
+        android:layout_marginTop="30dp" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/scores_list"
+        android:layout_below="@id/scores_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

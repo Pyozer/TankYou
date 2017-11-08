@@ -26,4 +26,10 @@
 
     </string>
     <string name="scores_title">Scores</string>
+    <string name="scores_position">Rang</string>
+    <string name="scores_user">Joueur</string>
+    <string name="scores_points">Points</string>
+    <string name="end_game_title">GAME OVER</string>
+    <string name="end_game_retry">Réessayer</string>
+    <string name="end_game_menu">Retour au menu</string>
 </resources>

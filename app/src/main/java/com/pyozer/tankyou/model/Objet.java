@@ -1,12 +1,12 @@
-package com.pyozer.tankyou;
+package com.pyozer.tankyou.model;
 
 import android.content.Context;
 import android.view.View;
 
 public abstract class Objet extends View {
 
-    float mPosX;
-    float mPosY;
+    public float mPosX;
+    public float mPosY;
 
     public Objet(Context context) {
         super(context);

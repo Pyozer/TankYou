@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    android:padding="@dimen/default_margin"
-    tools:context="com.pyozer.tankyou.RulesActivity">
+    android:padding="@dimen/default_margin">
 
     <TextView
         android:id="@+id/rules_title"
@@ -14,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="34dp"
+        android:layout_marginTop="40dp"
         android:text="@string/rules_title"
         android:textColor="@color/white"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Display2" />
@@ -38,6 +37,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/rules_title"
-        android:layout_marginTop="34dp"/>
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="14dp"/>
 
 </RelativeLayout>

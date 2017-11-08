@@ -1,11 +1,11 @@
-package com.pyozer.tankyou;
+package com.pyozer.tankyou.model;
 
 import android.content.Context;
 
 public class Missile extends Objet {
 
-    float mVitesse = 8f;
-    double angleRadian;
+    public float mVitesse = 8f;
+    public double angleRadian;
 
     public Missile(Context context, float angleDegreeDirection) {
         super(context);

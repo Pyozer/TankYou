@@ -1,13 +1,22 @@
-package com.pyozer.tankyou;
+package com.pyozer.tankyou.activity;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.WindowManager;
+import android.webkit.WebView;
+import android.widget.TextView;
+
+import com.pyozer.tankyou.view.GameView;
+import com.pyozer.tankyou.R;
 
 public class GameActivity extends BaseActivity {
 
@@ -58,31 +67,39 @@ public class GameActivity extends BaseActivity {
         mSimulationView.startSimulation();
     }
 
-    public void showGameWin() {
-        showGameEnd(true);
-    }
+    public void showGameEnd(int time, int score) {
+        final Dialog dialog = new Dialog(this, R.style.AppTheme_NoActionBar);
+        View view = LayoutInflater.from(this).inflate(R.layout.end_game_dialog, null);
 
-    public void showGameLose() {
-        showGameEnd(false);
-    }
-    private void showGameEnd(boolean isGameWin) {
-        AlertDialog.Builder builder;
-        builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
+        TextView textScore = view.findViewById(R.id.end_game_score);
+        String scoreDisplay = "SCORE\n" + score;
+        textScore.setText(scoreDisplay);
 
-        builder.setTitle("Vous avez " + ((isGameWin) ? "gagné" : "perdu") + " !")
-                .setMessage("Voulez-vous recommencer ?")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // continue with delete
-                    }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // do nothing
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .show();
+        TextView textDuration = view.findViewById(R.id.end_game_duration);
+        String durationDisplay = "DURÉE\n" + time + "sec";
+        textDuration.setText(durationDisplay);
+
+        view.findViewById(R.id.end_game_retry).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(GameActivity.this, GameActivity.class));
+                finish();
+                dialog.dismiss();
+            }
+        });
+        view.findViewById(R.id.end_game_exit).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(GameActivity.this, MainActivity.class));
+                finish();
+                dialog.dismiss();
+            }
+        });
+
+        dialog.setContentView(view);
+        dialog.setCancelable(false);
+
+        dialog.show();
     }
 
     @Override
