@@ -22,13 +22,13 @@ public class MainActivity extends BaseActivity {
         findViewById(R.id.scores).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //startActivity(new Intent(MainActivity.this, ScoresActivity.class));
+                startActivity(new Intent(MainActivity.this, ScoresActivity.class));
             }
         });
         findViewById(R.id.rules).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //startActivity(new Intent(MainActivity.this, RulesActivity.class));
+                startActivity(new Intent(MainActivity.this, RulesActivity.class));
             }
         });
         findViewById(R.id.about).setOnClickListener(new View.OnClickListener() {
@@ -40,19 +40,8 @@ public class MainActivity extends BaseActivity {
     }
 
     private void showAboutDialog() {
-        final Dialog dialog = new Dialog(this);
-
+        Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.about_dialog);
-
-        /*Button dialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
-        // if button is clicked, close the custom dialog
-        dialogButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });*/
-
         dialog.show();
     }
 

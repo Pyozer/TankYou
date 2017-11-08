@@ -17,4 +17,13 @@
     <string name="about">A propos</string>
     <string name="about_text">Application développé par Jean-Charles Moussé.</string>
     <string name="a_propos_title">A PROPOS</string>
+
+    <string name="title_activity_rules">RulesActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="rules_title">Règles</string>
+    <string name="rules_text">
+
+    </string>
+    <string name="scores_title">Scores</string>
 </resources>

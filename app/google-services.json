@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "399013487293",
+    "firebase_url": "https://tankyou-a80b5.firebaseio.com",
+    "project_id": "tankyou-a80b5",
+    "storage_bucket": "tankyou-a80b5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:399013487293:android:43379cc6513b4333",
+        "android_client_info": {
+          "package_name": "com.pyozer.tankyou"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "399013487293-ta9ea0bl1g4r77vj9e5faks7bb1kt4d3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKI6Indd7VjVwWGkMUxUHchlWDyJ2re9c"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
