@@ -32,4 +32,7 @@
     <string name="end_game_title">GAME OVER</string>
     <string name="end_game_retry">Réessayer</string>
     <string name="end_game_menu">Retour au menu</string>
+    <string name="input_required">Champs de saisie obligatoire</string>
+    <string name="ask_username">Votre pseudo</string>
+    <string name="choose_username">Saisissez un pseudo...</string>
 </resources>

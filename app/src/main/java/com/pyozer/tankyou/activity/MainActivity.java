@@ -1,16 +1,24 @@
 package com.pyozer.tankyou.activity;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.text.InputType;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.EditText;
 
 import com.pyozer.tankyou.R;
+import com.pyozer.tankyou.util.PrefUserManager;
 
 public class MainActivity extends BaseActivity {
 
+    private PrefUserManager prefUserManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +48,46 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 showAboutDialog();
+            }
+        });
+
+        prefUserManager = new PrefUserManager(this);
+        if(!prefUserManager.isUserExists()) {
+            askUsername();
+        }
+
+    }
+
+    private void askUsername() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        // I'm using fragment here so I'm using getView() to provide ViewGroup
+        // but you can provide here any other instance of ViewGroup from your Fragment / Activity
+        View viewInflated = LayoutInflater.from(this).inflate(R.layout.username_dialog, null, false);
+        // Set up the input
+        final EditText input = viewInflated.findViewById(R.id.input_username);
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        builder.setView(viewInflated);
+
+        // Set up the buttons
+        builder.setPositiveButton("Enregistrer", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {}
+        });
+
+        builder.setCancelable(false);
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+        //Overriding the handler immediately after show is probably a better approach than OnShowListener as described below
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String username = input.getText().toString().trim();
+                if(TextUtils.isEmpty(username)) {
+                    input.setError(getString(R.string.input_required));
+                } else {
+                    prefUserManager.saveUsername(username);
+                    dialog.dismiss();
+                }
             }
         });
     }

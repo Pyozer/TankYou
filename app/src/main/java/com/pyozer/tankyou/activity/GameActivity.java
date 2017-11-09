@@ -15,8 +15,15 @@ import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.pyozer.tankyou.model.RankScore;
+import com.pyozer.tankyou.util.PrefUserManager;
 import com.pyozer.tankyou.view.GameView;
 import com.pyozer.tankyou.R;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class GameActivity extends BaseActivity {
 
@@ -26,6 +33,7 @@ public class GameActivity extends BaseActivity {
     public WindowManager mWindowManager;
     public Display mDisplay;
     private WakeLock mWakeLock;
+    private PrefUserManager prefUserManager;
 
     /**
      * Called when the activity is first created.
@@ -46,6 +54,8 @@ public class GameActivity extends BaseActivity {
 
         // Create a bright wake lock
         mWakeLock = mPowerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, getClass().getName());
+
+        prefUserManager = new PrefUserManager(this);
 
         // instantiate our simulation view and set it as the activity's content
         mSimulationView = new GameView(this);
@@ -68,6 +78,7 @@ public class GameActivity extends BaseActivity {
     }
 
     public void showGameEnd(int time, int score) {
+        saveScore(score);
         final Dialog dialog = new Dialog(this, R.style.AppTheme_NoActionBar);
         View view = LayoutInflater.from(this).inflate(R.layout.end_game_dialog, null);
 
@@ -100,6 +111,20 @@ public class GameActivity extends BaseActivity {
         dialog.setCancelable(false);
 
         dialog.show();
+    }
+
+    private void saveScore(int scoreUser) {
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+        // Create new post at /user-posts/$userid/$postid and at
+        // /posts/$postid simultaneously
+        String key = mDatabase.child("scores").push().getKey();
+        RankScore score = new RankScore(scoreUser, prefUserManager.getUsername());
+        Map<String, Object> scoreValues = score.toMap();
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/scores/" + key, scoreValues);
+
+        mDatabase.updateChildren(childUpdates);
     }
 
     @Override

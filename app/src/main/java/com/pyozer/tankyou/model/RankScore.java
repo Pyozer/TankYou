@@ -1,5 +1,8 @@
 package com.pyozer.tankyou.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class RankScore {
 
     private int score;
@@ -26,5 +29,13 @@ public class RankScore {
 
     public void setUser(String user) {
         this.user = user;
+    }
+
+    public Map<String,Object> toMap() {
+        Map<String, Object> values = new HashMap<>();
+        values.put("score", score);
+        values.put("user", user);
+
+        return values;
     }
 }
