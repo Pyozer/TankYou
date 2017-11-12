@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.EditText;
 
@@ -37,10 +38,15 @@ public class MainActivity extends BaseActivity {
                 startActivity(new Intent(MainActivity.this, ScoresActivity.class));
             }
         });
+        findViewById(R.id.stats).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, StatsActivity.class));
+            }
+        });
         findViewById(R.id.rules).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //startActivity(new Intent(MainActivity.this, RulesActivity.class));
                 showRulesDialog();
             }
         });
@@ -51,6 +57,7 @@ public class MainActivity extends BaseActivity {
             }
         });
 
+        // Si le pseudo n'a pas été renseigné on le demande
         prefUserManager = new PrefUserManager(this);
         if(!prefUserManager.isUserExists()) {
             askUsername();
@@ -58,26 +65,29 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    /**
+     * Permet de demande à l'utilisateur son pseudo
+     * On stock le pseudo dans les SharedPreferences
+     */
     private void askUsername() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        // I'm using fragment here so I'm using getView() to provide ViewGroup
-        // but you can provide here any other instance of ViewGroup from your Fragment / Activity
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        // On récupère notre vue pour le dialog
         View viewInflated = LayoutInflater.from(this).inflate(R.layout.username_dialog, null, false);
-        // Set up the input
+        // On récupère l'EditText de la vue
         final EditText input = viewInflated.findViewById(R.id.input_username);
-        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        // On spécifie on dialog notre vue
         builder.setView(viewInflated);
 
-        // Set up the buttons
         builder.setPositiveButton("Enregistrer", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {}
         });
 
+        // On évite que l'utilisateur quitte le dialog sans avoir mis de pseudo
         builder.setCancelable(false);
         final AlertDialog dialog = builder.create();
         dialog.show();
-        //Overriding the handler immediately after show is probably a better approach than OnShowListener as described below
+        // On override notre listener pour enregistrer pour pouvoir géré les erreurs (champs vide)
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,18 +102,25 @@ public class MainActivity extends BaseActivity {
         });
     }
 
+    // Affiche les règles du jeu dans un dialog fullscreen
     private void showRulesDialog() {
+        // On créer un dialog avec un thème d'activity pour faire un dialog fullscreen
         final Dialog dialog = new Dialog(this, R.style.AppTheme_NoActionBar);
+        // On importe notre vue
         View view = LayoutInflater.from(this).inflate(R.layout.rules_dialog, null);
 
-        String rules_text = "<style>p {color: #ffffff; font-size: 20px; text-align: justify;}</style>" +
+        // Règles du jeu (HTML)
+        String rules_text = "<html><head><style>p {color: #ffffff; font-size: 20px; text-align: justify;}</style></head><body>" +
                 "<p>Le jeu se joue grâce à l'<strong>accéléromètre</strong> et à la <strong>boussole</strong> pour pouvoir se déplacer.<br />" +
                 "Le but est de contrôler un <strong>tank</strong> et d'éviter les <strong>obstacles</strong> qui se déplacent sur l'écran.<br /><br />" +
                 "Vous avez la possibilité avec votre tank de <strong>tirer des missiles</strong> pour détruire des obstacles.<br />" +
                 "Entre chaque tire, il y un temps d'attente de <strong>1.5sec</strong> durant laquel le tank recharge un missile.<br /><br />" +
-                "A chaque obstacle détruit vous gagnez <strong>un point</strong>. Si vous touchez un obstacle, vous perdez la partie.</p>";
+                "A chaque obstacle détruit vous gagnez <strong>un point</strong>. Si vous touchez un obstacle, vous perdez la partie.</p></body></html>";
 
+        // On créer notre webview
         WebView mWebView = view.findViewById(R.id.rules_text);
+        mWebView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+        mWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         mWebView.loadData(rules_text, "text/html; charset=UTF-8;", null);
         mWebView.setBackgroundColor(getResources().getColor(android.R.color.transparent));
 
@@ -115,10 +132,10 @@ public class MainActivity extends BaseActivity {
         });
 
         dialog.setContentView(view);
-
         dialog.show();
     }
 
+    // On affiche le dialog A propos
     private void showAboutDialog() {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.about_dialog);

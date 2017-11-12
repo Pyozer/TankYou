@@ -11,6 +11,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.animation.RotateAnimation;
@@ -21,23 +22,19 @@ import com.pyozer.tankyou.activity.GameActivity;
 import com.pyozer.tankyou.model.Missile;
 import com.pyozer.tankyou.model.Obstacle;
 import com.pyozer.tankyou.model.Tank;
+import com.pyozer.tankyou.util.FunctionsUtil;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 public class GameView extends FrameLayout implements SensorEventListener {
 
     private final GameActivity mContext;
     private Sensor mAccelerometer;
-    private Sensor mCompass;
-
-    private boolean isFirstCompassChanged = true;
-    private float mSensorDegreeCalibre;
 
     private float mSensorY;
-    private float mSensorDegree;
+    private float mSensorDegree = -90;
     private float mHorizontalMax;
     private float mVerticalMax;
 
@@ -46,22 +43,22 @@ public class GameView extends FrameLayout implements SensorEventListener {
     private List<Missile> mMissiles;
 
     private boolean tankAlreadyOnObstacle = false;
+    private boolean alreadyShowEndGame = false;
 
-    private long lastTime = System.currentTimeMillis();
+    private long lastTimeObstacle = 0;
     private long lastRocketFired;
     private long startGameTime;
 
     private Paint paintWhite;
     private int score = 0;
+    private boolean alreadyWindowFocus = false;
 
     public void startSimulation() {
         mContext.mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
-        mContext.mSensorManager.registerListener(this, mCompass, SensorManager.SENSOR_DELAY_GAME);
     }
 
     public void stopSimulation() {
         mContext.mSensorManager.unregisterListener(this, mAccelerometer);
-        mContext.mSensorManager.unregisterListener(this, mCompass);
     }
 
     public GameView(GameActivity context) {
@@ -69,7 +66,6 @@ public class GameView extends FrameLayout implements SensorEventListener {
         this.mContext = context;
 
         mAccelerometer = mContext.mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mCompass = mContext.mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
 
         DisplayMetrics metrics = new DisplayMetrics();
         mContext.getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -98,21 +94,14 @@ public class GameView extends FrameLayout implements SensorEventListener {
         Obstacle obstacle = new Obstacle(getContext());
         addView(obstacle, new ViewGroup.LayoutParams(110, 110));
 
-        int xRand = randInt((int) mHorizontalMax - obstacle.getWidth());
-        int yRand = randInt((int) mVerticalMax - obstacle.getHeight());
+        int xRand = FunctionsUtil.randInt((int) mHorizontalMax - obstacle.getWidth());
 
         if (obstacle.orientationNum == 1) { // FROM_TOP
             obstacle.setX(xRand);
             obstacle.setY(-obstacle.getHeight());
-        } else if (obstacle.orientationNum == 2) { // FROM_RIGHT
-            obstacle.setX(mHorizontalMax);
-            obstacle.setY(yRand);
         } else if (obstacle.orientationNum == 3) { // FROM_BOTTOM
             obstacle.setX(xRand);
             obstacle.setY(mVerticalMax);
-        } else if (obstacle.orientationNum == 4) { // FROM_LEFT
-            obstacle.setX(-obstacle.getWidth());
-            obstacle.setY(yRand);
         }
         obstacle.setBackgroundResource(R.drawable.obstacle);
         mObstacles.add(obstacle);
@@ -132,121 +121,103 @@ public class GameView extends FrameLayout implements SensorEventListener {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
 
-        mTank.setX(mHorizontalMax / 2 - mTank.getWidth() / 2);
-        mTank.setY(mVerticalMax / 2 - mTank.getHeight() / 2);
+        if (!alreadyWindowFocus) {
+            alreadyWindowFocus = true;
+            mTank.setX(mHorizontalMax / 2 - mTank.getWidth() / 2);
+            mTank.setY(mVerticalMax / 2 - mTank.getHeight() / 2);
 
-        mTank.setBackgroundResource(R.drawable.tanks_sprites_blue);
-    }
-
-    private int randInt(int max) {
-        return new Random().nextInt(max);
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        long currentTime = System.currentTimeMillis();
-        if(currentTime - lastRocketFired > 2000) {
-            createNewRocket();
-            lastRocketFired = currentTime;
+            mTank.setBackgroundResource(R.drawable.tanks_sprites_blue);
         }
-
-        return super.onTouchEvent(event);
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
-            if(isFirstCompassChanged) {
-                mSensorDegreeCalibre = event.values[0] + 90;
-                isFirstCompassChanged = false;
-            }
-            mSensorDegree = event.values[0] - mSensorDegreeCalibre;
-        } else if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             mSensorY = -event.values[1];
 
-            if (mSensorY > 1.1) {
+            if (mSensorY > 1.1)
                 mSensorY = 6.5f;
-            } else if (mSensorY < -1.1) {
+            else if (mSensorY < -1.6)
                 mSensorY = -6.5f;
-            } else {
+            else
                 mSensorY = 0;
-            }
 
-            if(mSensorY == 5 || mSensorY == -5) {
-                //TODO: ACTIVE SOUND
-            } else {
-                //TODO: DESACTIVE SOUND
-            }
+            float mSensorX = -event.values[0];
+
+            if(mSensorX > 2)
+                mSensorDegree += 2;
+            else if(mSensorX < -2)
+                mSensorDegree -= 2;
         }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
+        if (alreadyShowEndGame)
+            return;
+
+        long now = System.currentTimeMillis();
 
         // On vérifie si le tank ne touche pas un des obstacles
         boolean touchObstacle = false;
-        for(Iterator<Obstacle> iterator = mObstacles.iterator(); iterator.hasNext(); ) {
-            Obstacle obstacle = iterator.next();
+        for (Iterator<Obstacle> iteratorObstacle = mObstacles.iterator(); iteratorObstacle.hasNext(); ) {
+            Obstacle obstacle = iteratorObstacle.next();
             obstacle.updatePosObstacle();
             obstacle.setTranslationX(obstacle.mPosX);
             obstacle.setTranslationY(obstacle.mPosY);
 
-            if(obstacle.isOutOfScreen(mHorizontalMax, mVerticalMax)) {
+            if (obstacle.isOutOfScreen(mHorizontalMax, mVerticalMax)) {
                 removeView(obstacle);
-                iterator.remove();
+                iteratorObstacle.remove();
             } else {
                 touchObstacle = isTankOnObstacle(obstacle);
-                if(touchObstacle)
+                if (touchObstacle)
                     break;
-            }
-        }
-        //On bouge les missiles et check si ils touchent un obstacle
-        for(Iterator<Missile> iterator = mMissiles.iterator(); iterator.hasNext(); ) {
-            Missile missile = iterator.next();
-            missile.updatePosMissile();
-            missile.setTranslationX(missile.mPosX);
-            missile.setTranslationY(missile.mPosY);
+                // On vérifie si un missile touche l'obstacle
+                for (Iterator<Missile> iteratorMissile = mMissiles.iterator(); iteratorMissile.hasNext(); ) {
+                    Missile missile = iteratorMissile.next();
+                    missile.updatePosMissile();
+                    missile.setTranslationX(missile.mPosX);
+                    missile.setTranslationY(missile.mPosY);
 
-            if(missile.isOutOfScreen(mHorizontalMax, mVerticalMax)) {
-                removeView(missile);
-                iterator.remove();
-            } else {
-                for(Iterator<Obstacle> iteratorObstacle = mObstacles.iterator(); iteratorObstacle.hasNext(); ) {
-                    Obstacle obstacle = iteratorObstacle.next();
-                    if(isMissileOnObstacle(missile, obstacle)) {
-                        removeView(obstacle);
-                        iteratorObstacle.remove();
+                    if (missile.isOutOfScreen(mHorizontalMax, mVerticalMax)) {
                         removeView(missile);
-                        iterator.remove();
+                        iteratorMissile.remove();
+                    } else {
+                        if (isMissileOnObstacle(missile, obstacle)) {
+                            removeView(obstacle);
+                            iteratorObstacle.remove();
+                            removeView(missile);
+                            iteratorMissile.remove();
 
-                        score++;
+                            score++;
+                        }
                     }
                 }
             }
         }
 
         canvas.drawText("Score: " + score, 10, 60, paintWhite);
-        int deltaTimeSec = Math.round((System.currentTimeMillis() - startGameTime) / 1000);
-        canvas.drawText("Time: " + deltaTimeSec + "sec", 10, 120, paintWhite);
+        int gameDuration = Math.round((now - startGameTime) / 1000);
+        canvas.drawText("Time: " + gameDuration + "sec", 10, 130, paintWhite);
 
         // Si le tank touche un obstacle
-        if (tankAlreadyOnObstacle || touchObstacle) {
+        if ((tankAlreadyOnObstacle || touchObstacle) && !alreadyShowEndGame) {
+            alreadyShowEndGame = true;
             MediaPlayer mp = MediaPlayer.create(getContext(), R.raw.explosion);
             mp.start();
             stopSimulation();
-            int gameDuration = Math.round((System.currentTimeMillis() - startGameTime) / 1000);
             mContext.showGameEnd(gameDuration, score);
         } else {
             // Sinon si il touche rien
-            long currentTime = System.currentTimeMillis();
             float oldDegre = mTank.mDegre;
 
             mTank.computePhysics(mSensorY, mSensorDegree);
 
-            long deltaTime = (currentTime - lastTime);
-            if(deltaTime >= 1500) { // On créer un obstacle toute les 1.5sec
+            long deltaTime = (now - lastTimeObstacle);
+            if (deltaTime >= 1500) { // On créer un obstacle toute les 1.5sec
                 createNewObstacle();
-                lastTime = currentTime;
+                lastTimeObstacle = now;
             }
 
             mTank.resolveCollisionWithBounds(mHorizontalMax, mVerticalMax);
@@ -282,19 +253,19 @@ public class GameView extends FrameLayout implements SensorEventListener {
 
         double unrotatedCircleX = Math.cos(Math.toRadians(mTank.mDegre)) * (obstacleCenterX - tankCenterX) -
                 Math.sin(Math.toRadians(mTank.mDegre)) * (obstacleCenterY - tankCenterY) + tankCenterX;
-        double unrotatedCircleY  = Math.sin(Math.toRadians(mTank.mDegre)) * (obstacleCenterX - tankCenterX) +
+        double unrotatedCircleY = Math.sin(Math.toRadians(mTank.mDegre)) * (obstacleCenterX - tankCenterX) +
                 Math.cos(Math.toRadians(mTank.mDegre)) * (obstacleCenterY - tankCenterY) + tankCenterY;
 
         // Closest point in the rectangle to the center of circle rotated backwards(unrotated)
         double closestX, closestY;
 
         // Find the unrotated closest x point from center of unrotated circle
-        if (unrotatedCircleX  < mTank.mPosX)
+        if (unrotatedCircleX < mTank.mPosX)
             closestX = mTank.mPosX;
-        else if (unrotatedCircleX  > mTank.mPosX + mTank.getWidth())
+        else if (unrotatedCircleX > mTank.mPosX + mTank.getWidth())
             closestX = mTank.mPosX + mTank.getWidth();
         else
-            closestX = unrotatedCircleX ;
+            closestX = unrotatedCircleX;
 
         // Find the unrotated closest y point from center of unrotated circle
         if (unrotatedCircleY < mTank.mPosY)
@@ -304,7 +275,7 @@ public class GameView extends FrameLayout implements SensorEventListener {
         else
             closestY = unrotatedCircleY;
 
-        double distance = findDistance(unrotatedCircleX , unrotatedCircleY, closestX, closestY);
+        double distance = findDistance(unrotatedCircleX, unrotatedCircleY, closestX, closestY);
         if (distance < obstacle.getWidth() / 2) {
             tankAlreadyOnObstacle = true;
             return true;
@@ -313,7 +284,7 @@ public class GameView extends FrameLayout implements SensorEventListener {
         }
     }
 
-    public double findDistance(double fromX, double fromY, double toX, double toY){
+    public double findDistance(double fromX, double fromY, double toX, double toY) {
         double a = Math.abs(fromX - toX);
         double b = Math.abs(fromY - toY);
 
@@ -334,6 +305,16 @@ public class GameView extends FrameLayout implements SensorEventListener {
         double distance = Math.sqrt(dx * dx + dy * dy);
 
         return distance < missileRadius + obstacleRadius;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastRocketFired > 1500) {
+            createNewRocket();
+            lastRocketFired = currentTime;
+        }
+        return true;
     }
 
     @Override

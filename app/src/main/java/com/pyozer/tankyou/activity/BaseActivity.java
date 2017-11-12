@@ -4,22 +4,33 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
+import com.google.firebase.database.FirebaseDatabase;
+
+/**
+ * Activity de base
+ */
 public abstract class BaseActivity extends AppCompatActivity {
 
-    private static final String TAG = "BaseActivity";
+    private static boolean isInitialized = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // On met l'activity en mode Fullscreen
         View decorView = getWindow().getDecorView();
-        // Hide the status bar.
+        // Cache la status bar.
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
-    }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+        // On défini le mode persistant de Firebase
+        try{
+            if(!isInitialized){
+                FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+                isInitialized = true;
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

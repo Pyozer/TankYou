@@ -2,14 +2,14 @@ package com.pyozer.tankyou.model;
 
 import android.content.Context;
 
+import com.pyozer.tankyou.util.FunctionsUtil;
+
 import java.util.Random;
 
 public class Obstacle extends Objet {
 
     public final static int[] FROM_TOP = {0, 1};
     public final static int[] FROM_BOTTOM = {0, -1};
-    public final static int[] FROM_LEFT = {1, 0};
-    public final static int[] FROM_RIGHT = {-1, 0};
 
     public int[] orientation;
     public int orientationNum;
@@ -20,22 +20,16 @@ public class Obstacle extends Objet {
     public Obstacle(Context context) {
         super(context);
 
-        mVitesse = 1.5f + (new Random().nextFloat()) * (2.5f - 1.5f);
-        angleRadian = Math.toRadians(45 + (new Random().nextFloat()) * (135 - 45));
+        mVitesse = FunctionsUtil.randFloat(1.5f, 2.5f);
+        angleRadian = Math.toRadians(FunctionsUtil.randFloat(-45f, 45f));
 
-        orientationNum = (int) (1 + (new Random().nextFloat()) * (4 - 1));
+        orientationNum = FunctionsUtil.randInt(1, 2);
         switch (orientationNum) {
             case 1:
                 orientation = FROM_TOP.clone();
                 break;
             case 2:
-                orientation = FROM_RIGHT.clone();
-                break;
-            case 3:
                 orientation = FROM_BOTTOM.clone();
-                break;
-            case 4:
-                orientation = FROM_LEFT.clone();
                 break;
         }
     }

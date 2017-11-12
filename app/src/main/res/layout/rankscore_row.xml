@@ -7,12 +7,23 @@
     <TextView
         android:id="@+id/rankscore_user"
         android:layout_width="0dp"
-        android:layout_weight="0.75"
+        android:layout_weight="0.50"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/default_margin"
         android:paddingBottom="@dimen/default_margin"
         android:paddingStart="@dimen/default_margin"
         android:paddingEnd="8dp"
+        style="@style/TextAppearance.AppCompat.Medium.Inverse" />
+
+    <TextView
+        android:id="@+id/rankscore_duree"
+        android:layout_width="0dp"
+        android:layout_weight="0.25"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/default_margin"
+        android:paddingBottom="@dimen/default_margin"
+        android:paddingStart="8dp"
+        android:paddingEnd="@dimen/default_margin"
         style="@style/TextAppearance.AppCompat.Medium.Inverse" />
 
     <TextView

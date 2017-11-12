@@ -15,24 +15,23 @@
     <string name="scores">Scores</string>
     <string name="rules">Règles</string>
     <string name="about">A propos</string>
-    <string name="about_text">Application développé par Jean-Charles Moussé.</string>
+    <string name="about_text">Application développé dans le cadre d\'un projet Android par Jean-Charles Moussé.</string>
     <string name="a_propos_title">A PROPOS</string>
 
-    <string name="title_activity_rules">RulesActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="rules_title">Règles</string>
-    <string name="rules_text">
 
-    </string>
     <string name="scores_title">Scores</string>
-    <string name="scores_position">Rang</string>
+    <string name="stats_title">Mes scores</string>
     <string name="scores_user">Joueur</string>
     <string name="scores_points">Points</string>
+    <string name="scores_duree">Temps</string>
+    <string name="scores_date">Date</string>
+
     <string name="end_game_title">GAME OVER</string>
     <string name="end_game_retry">Réessayer</string>
     <string name="end_game_menu">Retour au menu</string>
+
     <string name="input_required">Champs de saisie obligatoire</string>
     <string name="ask_username">Votre pseudo</string>
-    <string name="choose_username">Saisissez un pseudo...</string>
+    <string name="choose_username">Saisissez un pseudo…</string>
 </resources>

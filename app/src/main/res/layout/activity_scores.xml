@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_rules"
+    android:id="@+id/activity_scores"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
@@ -44,14 +44,25 @@
         android:background="@color/backgroundLight">
 
         <TextView
+            android:id="@+id/scores_header_1"
             android:layout_width="0dp"
-            android:layout_weight="0.75"
+            android:layout_weight="0.50"
             android:layout_height="wrap_content"
-            android:text="@string/scores_user"
             android:paddingTop="@dimen/default_margin"
             android:paddingBottom="@dimen/default_margin"
             android:paddingStart="@dimen/default_margin"
             android:paddingEnd="8dp"
+            style="@style/Base.TextAppearance.AppCompat.Small.Inverse" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="0.25"
+            android:layout_height="wrap_content"
+            android:text="@string/scores_duree"
+            android:paddingTop="@dimen/default_margin"
+            android:paddingBottom="@dimen/default_margin"
+            android:paddingStart="8dp"
+            android:paddingEnd="@dimen/default_margin"
             style="@style/Base.TextAppearance.AppCompat.Small.Inverse" />
 
         <TextView
