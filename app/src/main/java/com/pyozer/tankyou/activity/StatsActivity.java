@@ -8,6 +8,9 @@ import com.google.firebase.database.Query;
 import com.pyozer.tankyou.R;
 import com.pyozer.tankyou.util.PrefUserManager;
 
+/**
+ * Activity pour afficher les scores du joueurs
+ */
 public class StatsActivity extends BaseScoreActivity {
 
     @Override
@@ -21,6 +24,10 @@ public class StatsActivity extends BaseScoreActivity {
         dateText.setText(getString(R.string.scores_date));
     }
 
+    /**
+     * Défini la requete Firebase pour récupérer les scores du joueur
+     * @return Query
+     */
     @Override
     public Query getQuery() {
         return FirebaseDatabase.getInstance()

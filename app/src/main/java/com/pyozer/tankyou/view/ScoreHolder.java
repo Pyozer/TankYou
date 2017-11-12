@@ -8,6 +8,9 @@ import android.widget.TextView;
 import com.pyozer.tankyou.R;
 import com.pyozer.tankyou.model.UserScore;
 
+/**
+ * ViewHolder pour la recyclerview des scores
+ */
 public class ScoreHolder extends RecyclerView.ViewHolder {
 
     private TextView mUserField;
@@ -22,6 +25,7 @@ public class ScoreHolder extends RecyclerView.ViewHolder {
     }
 
     public void bind(UserScore rankScore) {
+        // Si on veut afficher la date ou le pseudo (Leaderboard ou Score du joueur)
         if(rankScore.getUser() == null || TextUtils.isEmpty(rankScore.getUser())) {
             mUserField.setText(rankScore.getDateFormat());
         } else {

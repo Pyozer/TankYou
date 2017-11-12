@@ -6,6 +6,9 @@ import com.pyozer.tankyou.util.FunctionsUtil;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Classe du score de l'utilisateur
+ */
 public class UserScore {
 
     private String user;
@@ -54,6 +57,10 @@ public class UserScore {
         return date;
     }
 
+    /**
+     * Renvoi la date formaté pour l'affichage (Il y a x j/h/min/sec)
+     * @return
+     */
     public String getDateFormat() {
         return FunctionsUtil.getDateFormated(date);
     }
@@ -62,6 +69,10 @@ public class UserScore {
         this.date = date;
     }
 
+    /**
+     * Renvoi un Map avec les valeurs du score, durée et date
+     * @return Map Valeur de l'objet
+     */
     public Map<String,Object> toUserStatsMap() {
         Map<String, Object> values = new HashMap<>();
         values.put("score", score);
@@ -71,6 +82,10 @@ public class UserScore {
         return values;
     }
 
+    /**
+     * Renvoi un Map avec les valeurs du score, durée, pseudo et date
+     * @return Map Valeur de l'objet
+     */
     public Map<String,Object> toLeaderboardMap() {
         Map<String, Object> values = new HashMap<>();
         values.put("score", score);

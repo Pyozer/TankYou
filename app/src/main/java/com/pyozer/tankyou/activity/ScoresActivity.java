@@ -7,6 +7,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.pyozer.tankyou.R;
 
+/**
+ * Activity pour afficher le Leaderboard
+ */
 public class ScoresActivity extends BaseScoreActivity {
 
     @Override
@@ -20,6 +23,9 @@ public class ScoresActivity extends BaseScoreActivity {
         dateText.setText(getString(R.string.scores_user));
     }
 
+    /**
+     * Défini notre requete pour récupéré les 50 premiers scores
+     */
     @Override
     protected Query getQuery() {
         return FirebaseDatabase.getInstance()

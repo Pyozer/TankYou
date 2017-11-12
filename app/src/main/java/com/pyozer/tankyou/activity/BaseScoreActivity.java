@@ -41,7 +41,7 @@ public abstract class BaseScoreActivity extends BaseActivity {
         mRecycler = findViewById(R.id.scores_list);
         mLoader = findViewById(R.id.scores_loader);
 
-        // On charges les scores
+        // Charges les scores
         populateScoreData();
     }
 
@@ -76,7 +76,7 @@ public abstract class BaseScoreActivity extends BaseActivity {
             }
         };
 
-        // On ajoute les élément par le haut pour trier de manière décroissant
+        // Ajoute les élément par le haut pour trier de manière décroissant
         // Firebase ne permet pas le trie descroissant)
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setReverseLayout(true);

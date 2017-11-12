@@ -14,24 +14,26 @@ import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.pyozer.tankyou.R;
 import com.pyozer.tankyou.model.UserScore;
 import com.pyozer.tankyou.util.PrefUserManager;
 import com.pyozer.tankyou.view.GameView;
-import com.pyozer.tankyou.R;
 
+/**
+ * Activity du jeu
+ */
 public class GameActivity extends BaseActivity {
 
     private GameView mSimulationView;
     public SensorManager mSensorManager;
+
     public PowerManager mPowerManager;
     public WindowManager mWindowManager;
     public Display mDisplay;
     private WakeLock mWakeLock;
+
     private PrefUserManager prefUserManager;
 
-    /**
-     * Called when the activity is first created.
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,8 +73,13 @@ public class GameActivity extends BaseActivity {
         mSimulationView.startSimulation();
     }
 
+    /**
+     * Affiche l'interface de fin de jeu
+     */
     public void showGameEnd(int time, int score) {
+        // Envoi les scores à Firebase
         saveScore(time, score);
+        // Créer notre dialog fullscreen
         final Dialog dialog = new Dialog(this, R.style.AppTheme_NoActionBar);
         View view = LayoutInflater.from(this).inflate(R.layout.end_game_dialog, null);
 
@@ -107,6 +114,11 @@ public class GameActivity extends BaseActivity {
         dialog.show();
     }
 
+    /**
+     * Enregistre les scores sur Firebase
+     * @param duree int - Durée de la partie
+     * @param scoreUser int - score de la partie
+     */
     private void saveScore(int duree, int scoreUser) {
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
 

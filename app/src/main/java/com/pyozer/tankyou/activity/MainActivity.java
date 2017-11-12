@@ -5,11 +5,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.text.InputType;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.EditText;
@@ -17,6 +15,9 @@ import android.widget.EditText;
 import com.pyozer.tankyou.R;
 import com.pyozer.tankyou.util.PrefUserManager;
 
+/**
+ * Activity principale contenant le menu du jeu
+ */
 public class MainActivity extends BaseActivity {
 
     private PrefUserManager prefUserManager;
@@ -71,11 +72,11 @@ public class MainActivity extends BaseActivity {
      */
     private void askUsername() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        // On récupère notre vue pour le dialog
+        // Récupère notre vue pour le dialog
         View viewInflated = LayoutInflater.from(this).inflate(R.layout.username_dialog, null, false);
-        // On récupère l'EditText de la vue
+        // Récupère l'EditText de la vue
         final EditText input = viewInflated.findViewById(R.id.input_username);
-        // On spécifie on dialog notre vue
+        // Spécifie on dialog notre vue
         builder.setView(viewInflated);
 
         builder.setPositiveButton("Enregistrer", new DialogInterface.OnClickListener() {
@@ -83,11 +84,11 @@ public class MainActivity extends BaseActivity {
             public void onClick(DialogInterface dialog, int which) {}
         });
 
-        // On évite que l'utilisateur quitte le dialog sans avoir mis de pseudo
+        // Evite que l'utilisateur quitte le dialog sans avoir mis de pseudo
         builder.setCancelable(false);
         final AlertDialog dialog = builder.create();
         dialog.show();
-        // On override notre listener pour enregistrer pour pouvoir géré les erreurs (champs vide)
+        // Override notre listener pour enregistrer pour pouvoir géré les erreurs (champs vide)
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,11 +103,13 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    // Affiche les règles du jeu dans un dialog fullscreen
+    /**
+     * Affiche les règles du jeu dans un dialog fullscreen
+     */
     private void showRulesDialog() {
-        // On créer un dialog avec un thème d'activity pour faire un dialog fullscreen
+        // Créer un dialog avec un thème d'activity pour faire un dialog fullscreen
         final Dialog dialog = new Dialog(this, R.style.AppTheme_NoActionBar);
-        // On importe notre vue
+        // Importe notre vue
         View view = LayoutInflater.from(this).inflate(R.layout.rules_dialog, null);
 
         // Règles du jeu (HTML)
@@ -117,7 +120,7 @@ public class MainActivity extends BaseActivity {
                 "Entre chaque tire, il y un temps d'attente de <strong>1.5sec</strong> durant laquel le tank recharge un missile.<br /><br />" +
                 "A chaque obstacle détruit vous gagnez <strong>un point</strong>. Si vous touchez un obstacle, vous perdez la partie.</p></body></html>";
 
-        // On créer notre webview
+        // Créer notre webview
         WebView mWebView = view.findViewById(R.id.rules_text);
         mWebView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         mWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
@@ -135,7 +138,9 @@ public class MainActivity extends BaseActivity {
         dialog.show();
     }
 
-    // On affiche le dialog A propos
+    /**
+     * Affiche le dialog pour A propos
+     */
     private void showAboutDialog() {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.about_dialog);
