@@ -6,11 +6,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 
 import com.pyozer.tankyou.R;
 import com.pyozer.tankyou.util.PrefUserManager;
@@ -21,6 +24,7 @@ import com.pyozer.tankyou.util.PrefUserManager;
 public class MainActivity extends BaseActivity {
 
     private PrefUserManager prefUserManager;
+    private Dialog dialogRules;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +35,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, GameActivity.class));
+                finish();
             }
         });
         findViewById(R.id.scores).setOnClickListener(new View.OnClickListener() {
@@ -64,6 +69,7 @@ public class MainActivity extends BaseActivity {
             askUsername();
         }
 
+        loadRulesDialog();
     }
 
     /**
@@ -104,14 +110,15 @@ public class MainActivity extends BaseActivity {
     }
 
     /**
-     * Affiche les règles du jeu dans un dialog fullscreen
+     * Charge le Dialog pour afficher les règles
+     * Permet de charger la vue du Dialog au lancement de l'activity
      */
-    private void showRulesDialog() {
-        // Créer un dialog avec un thème d'activity pour faire un dialog fullscreen
-        final Dialog dialog = new Dialog(this, R.style.AppTheme_NoActionBar);
-        // Importe notre vue
-        View view = LayoutInflater.from(this).inflate(R.layout.rules_dialog, null);
-
+    private void loadRulesDialog() {
+        dialogRules = new Dialog(this, R.style.AppTheme_NoActionBar);
+        // Récupération de la vue du dialog
+        LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
+        View viewRulesDialog = inflater.inflate(R.layout.rules_dialog, null);
+        dialogRules.setContentView(viewRulesDialog);
         // Règles du jeu (HTML)
         String rules_text = "<html><head><style>p {color: #ffffff; font-size: 20px; text-align: justify;}</style></head><body>" +
                 "<p>Le but est de contrôler un <strong>tank</strong> et d'éviter les <strong>obstacles</strong> qui se déplacent sur l'écran.<br /><br />" +
@@ -122,21 +129,25 @@ public class MainActivity extends BaseActivity {
                 "A chaque obstacle détruit vous gagnez <strong>un point</strong>. Si vous touchez un obstacle, vous perdez la partie.</p></body></html>";
 
         // Créer notre webview
-        WebView mWebView = view.findViewById(R.id.rules_text);
-        mWebView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
-        mWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        WebView mWebView = viewRulesDialog.findViewById(R.id.rules_text);
         mWebView.loadData(rules_text, "text/html; charset=UTF-8;", null);
         mWebView.setBackgroundColor(getResources().getColor(android.R.color.transparent));
 
-        view.findViewById(R.id.rules_back).setOnClickListener(new View.OnClickListener() {
+        viewRulesDialog.findViewById(R.id.rules_back).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            dialog.dismiss();
+                dialogRules.dismiss();
             }
         });
 
-        dialog.setContentView(view);
-        dialog.show();
+    }
+
+    /**
+     * Affiche le dialog pour les règles du jeu
+     */
+    private void showRulesDialog() {
+        if(!dialogRules.isShowing())
+            dialogRules.show();
     }
 
     /**

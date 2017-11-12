@@ -85,6 +85,7 @@ public abstract class BaseScoreActivity extends BaseActivity {
         // Firebase ne permet pas le trie descroissant)
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setReverseLayout(true);
+        layoutManager.setStackFromEnd(true);
         mRecycler.setLayoutManager(layoutManager);
         mRecycler.setAdapter(mAdapter);
     }

@@ -125,6 +125,8 @@ public class GameView extends FrameLayout implements SensorEventListener {
         missile.setX(mTank.mPosX + mTank.getWidth() / 2 - 25);
         missile.setY(mTank.mPosY);
         mMissiles.add(missile);
+        // On fait un bruit d'explosion car le tank a touché un obstacle
+        mContext.soundPool.play(mContext.soundIds[1], 1, 1, 1, 0, 1.0f);
     }
 
     @Override
@@ -230,6 +232,7 @@ public class GameView extends FrameLayout implements SensorEventListener {
                             iteratorMissile.remove();
                             // On inscrémente le score du joueur
                             score++;
+                            mContext.soundPool.play(mContext.soundIds[0], 1, 1, 1, 0, 1.0f);
                         }
                     }
                 }
@@ -247,8 +250,7 @@ public class GameView extends FrameLayout implements SensorEventListener {
         if ((tankAlreadyOnObstacle || touchObstacle) && !alreadyShowEndGame) {
             alreadyShowEndGame = true;
             // On fait un bruit d'explosion car le tank a touché un obstacle
-            MediaPlayer mp = MediaPlayer.create(getContext(), R.raw.explosion);
-            mp.start();
+            mContext.soundPool.play(mContext.soundIds[0], 1, 1, 1, 0, 1.0f);
             // Stop l'écoute du sensor
             stopSimulation();
             // Affiche l'interface de fin de jeu

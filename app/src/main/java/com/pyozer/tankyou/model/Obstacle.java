@@ -26,9 +26,7 @@ public class Obstacle extends Objet {
 
         // On défini une vitesse et angle aléatoire
         mVitesse = FunctionsUtil.randFloat(1.5f, 2.5f);
-        float angleDegree = FunctionsUtil.randFloat(70f, 110f);
-        angleRadian = Math.toRadians(angleDegree);
-        Log.e("ANGLE", angleDegree + "");
+        angleRadian = Math.toRadians(FunctionsUtil.randFloat(70f, 110f));
 
         // On défini l'origine (vers le bas ou vers le haut)
         isFromTop = new Random().nextBoolean();

@@ -3,6 +3,9 @@ package com.pyozer.tankyou.activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.hardware.SensorManager;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -34,6 +37,9 @@ public class GameActivity extends BaseActivity {
 
     private PrefUserManager prefUserManager;
 
+    public SoundPool soundPool;
+    public int soundIds[];
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +58,21 @@ public class GameActivity extends BaseActivity {
         mWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, getClass().getName());
 
         prefUserManager = new PrefUserManager(this);
+
+        AudioAttributes attrs = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_GAME)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build();
+
+        soundPool = new SoundPool.Builder()
+                .setMaxStreams(10)
+                .setAudioAttributes(attrs)
+                .build();
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
+        soundIds = new int[3];
+        soundIds[0] = soundPool.load(this, R.raw.sf_explosion_01, 1);
+        soundIds[1] = soundPool.load(this, R.raw.sf_canon_01, 1);
 
         // instantiate our simulation view and set it as the activity's content
         mSimulationView = new GameView(this);
