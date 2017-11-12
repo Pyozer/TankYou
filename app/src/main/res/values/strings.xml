@@ -34,4 +34,5 @@
     <string name="input_required">Champs de saisie obligatoire</string>
     <string name="ask_username">Votre pseudo</string>
     <string name="choose_username">Saisissez un pseudo…</string>
+    <string name="scores_reset">Reset</string>
 </resources>

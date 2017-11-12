@@ -114,10 +114,11 @@ public class MainActivity extends BaseActivity {
 
         // Règles du jeu (HTML)
         String rules_text = "<html><head><style>p {color: #ffffff; font-size: 20px; text-align: justify;}</style></head><body>" +
-                "<p>Le jeu se joue grâce à l'<strong>accéléromètre</strong> et à la <strong>boussole</strong> pour pouvoir se déplacer.<br />" +
-                "Le but est de contrôler un <strong>tank</strong> et d'éviter les <strong>obstacles</strong> qui se déplacent sur l'écran.<br /><br />" +
+                "<p>Le but est de contrôler un <strong>tank</strong> et d'éviter les <strong>obstacles</strong> qui se déplacent sur l'écran.<br /><br />" +
+                "Le jeu se joue grâce à l'<strong>accéléromètre</strong> pour pouvoir se déplacer.<br />" +
+                "Pour avancer il suffit de pencher son téléphone en avant ou en arrière. Pour tourner à gauche ou à droite il faut pencher le téléphone sur le côté<br /><br />" +
                 "Vous avez la possibilité avec votre tank de <strong>tirer des missiles</strong> pour détruire des obstacles.<br />" +
-                "Entre chaque tire, il y un temps d'attente de <strong>1.5sec</strong> durant laquel le tank recharge un missile.<br /><br />" +
+                "Entre chaque tire, il y un temps d'attente de <strong>1.5sec</strong> durant laquel le tank recharge son missile.<br /><br />" +
                 "A chaque obstacle détruit vous gagnez <strong>un point</strong>. Si vous touchez un obstacle, vous perdez la partie.</p></body></html>";
 
         // Créer notre webview

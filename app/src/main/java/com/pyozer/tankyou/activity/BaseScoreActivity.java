@@ -13,6 +13,7 @@ import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.Query;
 import com.pyozer.tankyou.R;
 import com.pyozer.tankyou.model.UserScore;
+import com.pyozer.tankyou.util.PrefUserManager;
 import com.pyozer.tankyou.view.ScoreHolder;
 
 /**
@@ -25,6 +26,8 @@ public abstract class BaseScoreActivity extends BaseActivity {
     private RecyclerView mRecycler;
 
     private ProgressBar mLoader;
+
+    protected PrefUserManager prefUserManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +43,8 @@ public abstract class BaseScoreActivity extends BaseActivity {
 
         mRecycler = findViewById(R.id.scores_list);
         mLoader = findViewById(R.id.scores_loader);
+
+        prefUserManager = new PrefUserManager(this);
 
         // Charges les scores
         populateScoreData();

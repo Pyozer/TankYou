@@ -101,9 +101,9 @@ public class GameView extends FrameLayout implements SensorEventListener {
         int xRand = FunctionsUtil.randInt((int) mHorizontalMax - obstacle.getWidth());
 
         // On défini la position en Y selon si notre obstacle commence en haut ou en bas
-        if (obstacle.orientationNum == 1) { // FROM_TOP
+        if (obstacle.isFromTop) { // FROM_TOP
             obstacle.setY(-obstacle.getHeight());
-        } else if (obstacle.orientationNum == 3) { // FROM_BOTTOM
+        } else { // FROM_BOTTOM
             obstacle.setY(mVerticalMax);
         }
         obstacle.setX(xRand); // On défini la position en X de notre obstacle

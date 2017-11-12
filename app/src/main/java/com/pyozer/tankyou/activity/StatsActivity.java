@@ -1,12 +1,14 @@
 package com.pyozer.tankyou.activity;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.pyozer.tankyou.R;
-import com.pyozer.tankyou.util.PrefUserManager;
 
 /**
  * Activity pour afficher les scores du joueurs
@@ -22,6 +24,24 @@ public class StatsActivity extends BaseScoreActivity {
 
         TextView dateText = findViewById(R.id.scores_header_1);
         dateText.setText(getString(R.string.scores_date));
+
+        Button btnReset = findViewById(R.id.scores_reset);
+        btnReset.setVisibility(View.VISIBLE);
+        btnReset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                resetScores();
+            }
+        });
+    }
+
+    /**
+     * Reset les scores de l'utilisateur
+     */
+    private void resetScores() {
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        mDatabase.child("scores").child(prefUserManager.getUsername()).removeValue();
     }
 
     /**
@@ -32,6 +52,6 @@ public class StatsActivity extends BaseScoreActivity {
     public Query getQuery() {
         return FirebaseDatabase.getInstance()
                 .getReference()
-                .child("scores").child(new PrefUserManager(this).getUsername()).orderByChild("date");
+                .child("scores").child(prefUserManager.getUsername()).orderByChild("date");
     }
 }
