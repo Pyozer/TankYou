@@ -9,8 +9,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.media.MediaPlayer;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.animation.RotateAnimation;
@@ -53,6 +53,8 @@ public class GameView extends FrameLayout implements SensorEventListener {
     private long startGameTime;
 
     private Paint paintWhite;
+    private Paint paintRed;
+
     private int score = 0;
     private boolean alreadyWindowFocus = false;
 
@@ -85,6 +87,10 @@ public class GameView extends FrameLayout implements SensorEventListener {
         paintWhite = new Paint();
         paintWhite.setColor(Color.WHITE);
         paintWhite.setTextSize(60);
+
+        paintRed = new Paint();
+        paintRed.setColor(Color.RED);
+        paintRed.setTextSize(60);
 
         // On défini le moment ou le jeu commence
         startGameTime = System.currentTimeMillis();
@@ -182,6 +188,8 @@ public class GameView extends FrameLayout implements SensorEventListener {
         return true;
     }
 
+    private int widthBar = 0;
+
     @Override
     protected void onDraw(Canvas canvas) {
         if (alreadyShowEndGame)
@@ -190,7 +198,86 @@ public class GameView extends FrameLayout implements SensorEventListener {
         // On récupère le timestamp actuelle
         long now = System.currentTimeMillis();
 
-        // On part du principe que le tank ne touche aucun obstacle
+        // Déplace les obstacles et vérifie les collisions (entre le tank et les missiles)
+        boolean touchObstacle = moveObstacleAndCheckCollision();
+
+        // Affiche le score en haut à gauche de l'écran
+        canvas.drawText("Score: " + score, 10, 60, paintWhite);
+        // Récupère le temps de jeu actuel
+        int gameDuration = Math.round((now - startGameTime) / 1000);
+        // Affiche le temps de jeu en dessous du score
+        canvas.drawText("Time: " + gameDuration + "sec", 10, 130, paintWhite);
+
+        // Si le tank touche un obstacle et que l'on a pas déjà afficher le gameover
+        if ((tankAlreadyOnObstacle || touchObstacle) && !alreadyShowEndGame) {
+            tankTouchObstacle(gameDuration);
+        } else {
+            // Défini la rotation actuelle du tank
+            float oldDegre = mTank.mDegre;
+
+            // On met à jour la position du tank selon l'inclinaison du téléphone
+            mTank.computePhysics(mSensorY, mSensorDegree);
+
+            // Calcule la durée entre maintenant et le dernier obstacle lancé
+            long deltaTime = (now - lastTimeObstacle);
+            if (deltaTime > 1500) { // Créer un obstacle toute les 1.5sec
+                createNewObstacle();
+                lastTimeObstacle = now;
+            }
+
+            canvas.drawRect(
+                    mTank.mPosX + 35,
+                    mTank.mPosY - 55,
+                    mTank.mPosX + mTank.getWidth() - 35,
+                    mTank.mPosY - 40,
+                    paintWhite);
+
+            long deltaTimeRocket = now - lastRocketFired;
+            if(deltaTimeRocket > 1500)
+                deltaTimeRocket = 1500;
+
+            Log.e("TEST", deltaTimeRocket + " / " + ((float) deltaTimeRocket / 1500f) + "");
+
+            canvas.drawRect(
+                    mTank.mPosX + 35,
+                    mTank.mPosY - 55,
+                    mTank.mPosX + mTank.getWidth() * ((float) deltaTimeRocket / 1500f) - 35,
+                    mTank.mPosY - 40,
+                    paintRed);
+
+            // Ajuste la position du tank si celui-ci sort de l'écran
+            mTank.resolveCollisionWithBounds(mHorizontalMax, mVerticalMax);
+            // Fait bouger le tank
+            mTank.setTranslationX(mTank.mPosX);
+            mTank.setTranslationY(mTank.mPosY);
+
+            // Oriente le Tank
+            updateTankOrientation(oldDegre, mTank.mDegre);
+
+            // Force le onDraw()
+            invalidate();
+        }
+    }
+
+    /**
+     * Affiche le menu gameover
+     * @param gameDuration Durée en seconde du jeu
+     */
+    private void tankTouchObstacle(int gameDuration) {
+        alreadyShowEndGame = true;
+        // On fait un bruit d'explosion car le tank a touché un obstacle
+        mContext.soundPool.play(mContext.soundIds[0], 1, 1, 1, 0, 1.0f);
+        // Stop l'écoute du sensor
+        stopSimulation();
+        // Affiche l'interface de fin de jeu
+        mContext.showGameEnd(gameDuration, score);
+    }
+
+    /**
+     * Bouge un obstacle et vérifie si il y a collision avec le tank
+     * @return boolean - Si un obstacle a touché le tank
+     */
+    public boolean moveObstacleAndCheckCollision() {
         boolean touchObstacle = false;
         // Pour chaque obstacle on le déplace et vérifie qu'il ne touche aucun missile ou tank
         for (Iterator<Obstacle> iteratorObstacle = mObstacles.iterator(); iteratorObstacle.hasNext(); ) {
@@ -210,77 +297,49 @@ public class GameView extends FrameLayout implements SensorEventListener {
                 touchObstacle = isTankOnObstacle(obstacle);
                 if (touchObstacle) // Si c'est le cas ou quitte la boucle
                     break;
-                // Pour chaque missile, on vérifie si il touche l'obstacle
-                for (Iterator<Missile> iteratorMissile = mMissiles.iterator(); iteratorMissile.hasNext(); ) {
-                    Missile missile = iteratorMissile.next();
-                    // On met à jour la position du missile
-                    missile.updatePosMissile();
-                    // On bouge le missile selon les nouvelle position
-                    missile.setTranslationX(missile.mPosX);
-                    missile.setTranslationY(missile.mPosY);
+                if(checkMissileCollision(obstacle)) {
+                    removeView(obstacle);
+                    iteratorObstacle.remove();
+                }
 
-                    // Si le missile est en dehors de l'écran on le supprime
-                    if (missile.isOutOfScreen(mHorizontalMax, mVerticalMax)) {
-                        removeView(missile);
-                        iteratorMissile.remove();
-                    } else {
-                        // Si le missile touche un obstacle on le supprime lui et l'obstacle
-                        if (isMissileOnObstacle(missile, obstacle)) {
-                            removeView(obstacle);
-                            iteratorObstacle.remove();
-                            removeView(missile);
-                            iteratorMissile.remove();
-                            // On inscrémente le score du joueur
-                            score++;
-                            mContext.soundPool.play(mContext.soundIds[0], 1, 1, 1, 0, 1.0f);
-                        }
-                    }
+            }
+        }
+        return touchObstacle;
+    }
+
+    /**
+     * Vérifie si un obstacle touche un missile
+     * @param obstacle Obstacle à vérifier
+     * @return boolean - L'obstacle touche un missile ou pas
+     */
+    private boolean checkMissileCollision(Obstacle obstacle) {
+        boolean isObstacleTouch = false;
+        // Pour chaque missile, on vérifie si il touche l'obstacle
+        for (Iterator<Missile> iteratorMissile = mMissiles.iterator(); iteratorMissile.hasNext(); ) {
+            Missile missile = iteratorMissile.next();
+            // On met à jour la position du missile
+            missile.updatePosMissile();
+            // On bouge le missile selon les nouvelle position
+            missile.setTranslationX(missile.mPosX);
+            missile.setTranslationY(missile.mPosY);
+
+            // Si le missile est en dehors de l'écran on le supprime
+            if (missile.isOutOfScreen(mHorizontalMax, mVerticalMax)) {
+                removeView(missile);
+                iteratorMissile.remove();
+            } else {
+                // Si le missile touche un obstacle on le supprime lui et l'obstacle
+                if (isMissileOnObstacle(missile, obstacle)) {
+                    isObstacleTouch = true;
+                    removeView(missile);
+                    iteratorMissile.remove();
+                    // On inscrémente le score du joueur
+                    score++;
+                    mContext.soundPool.play(mContext.soundIds[0], 1, 1, 1, 0, 1.0f);
                 }
             }
         }
-
-        // Affiche le score en haut à gauche de l'écran
-        canvas.drawText("Score: " + score, 10, 60, paintWhite);
-        // Récupère le temps de jeu actuel
-        int gameDuration = Math.round((now - startGameTime) / 1000);
-        // Affiche le temps de jeu en dessous du score
-        canvas.drawText("Time: " + gameDuration + "sec", 10, 130, paintWhite);
-
-        // Si le tank touche un obstacle et que l'on a pas déjà afficher le gameover
-        if ((tankAlreadyOnObstacle || touchObstacle) && !alreadyShowEndGame) {
-            alreadyShowEndGame = true;
-            // On fait un bruit d'explosion car le tank a touché un obstacle
-            mContext.soundPool.play(mContext.soundIds[0], 1, 1, 1, 0, 1.0f);
-            // Stop l'écoute du sensor
-            stopSimulation();
-            // Affiche l'interface de fin de jeu
-            mContext.showGameEnd(gameDuration, score);
-        } else {
-            // Défini la rotation actuelle du tank
-            float oldDegre = mTank.mDegre;
-
-            // On met à jour la position du tank selon l'inclinaison du téléphone
-            mTank.computePhysics(mSensorY, mSensorDegree);
-
-            // Calcule la durée entre maintenant et le dernier obstacle lancé
-            long deltaTime = (now - lastTimeObstacle);
-            if (deltaTime >= 1500) { // Créer un obstacle toute les 1.5sec
-                createNewObstacle();
-                lastTimeObstacle = now;
-            }
-
-            // Ajuste la position du tank si celui-ci sort de l'écran
-            mTank.resolveCollisionWithBounds(mHorizontalMax, mVerticalMax);
-            // Fait bouger le tank
-            mTank.setTranslationX(mTank.mPosX);
-            mTank.setTranslationY(mTank.mPosY);
-
-            // Oriente le Tank
-            updateTankOrientation(oldDegre, mTank.mDegre);
-
-            // Force le onDraw()
-            invalidate();
-        }
+        return isObstacleTouch;
     }
 
     /**
