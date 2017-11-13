@@ -35,4 +35,9 @@
     <string name="ask_username">Votre pseudo</string>
     <string name="choose_username">Saisissez un pseudo…</string>
     <string name="scores_reset">Reset</string>
+    <string name="score">SCORE</string>
+    <string name="duree">DUREE</string>
+    <string name="save">Enregistrer</string>
+    <string name="game_score">Score:</string>
+    <string name="game_time">Temps:</string>
 </resources>

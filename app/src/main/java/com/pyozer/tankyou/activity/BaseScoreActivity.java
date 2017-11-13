@@ -50,10 +50,16 @@ public abstract class BaseScoreActivity extends BaseActivity {
         populateScoreData();
     }
 
-    // Permet aux activity de score de définir leur propre requete pour Firebase
+    /**
+     * Permet aux activity de score de définir leur propre requete pour Firebase
+     * @return Requete pour récuperer les scores
+     */
     protected abstract Query getQuery();
 
-    // Charge les scores de Firebase dans la recyclerview
+    /**
+     * Charge les scores de Firebase dans la recyclerview
+     * A l'aide de l'adapter de FIrebase
+     */
     private void populateScoreData() {
         FirebaseRecyclerOptions<UserScore> options = new FirebaseRecyclerOptions.Builder<UserScore>()
                 .setQuery(getQuery(), UserScore.class)

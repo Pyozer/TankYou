@@ -1,13 +1,8 @@
 package com.pyozer.tankyou.activity;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-
-import com.pyozer.tankyou.R;
+import android.support.v7.app.AppCompatActivity;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
@@ -15,6 +10,7 @@ public class SplashScreenActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // On redirige directement vers notre menu
         startActivity(new Intent(this, MainActivity.class));
         finish();
 

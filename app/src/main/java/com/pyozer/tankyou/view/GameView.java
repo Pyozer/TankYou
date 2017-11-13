@@ -10,7 +10,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.animation.RotateAnimation;
@@ -36,32 +35,41 @@ public class GameView extends FrameLayout implements SensorEventListener {
     private final GameActivity mContext;
     private Sensor mAccelerometer;
 
+    // Valeur mis à jour par l'accéléromètre
     private float mSensorY;
     private float mSensorDegree = -90;
+    // Dimensions de l'écran
     private float mHorizontalMax;
     private float mVerticalMax;
 
+    // Tank et elements du jeu
     private Tank mTank;
     private List<Obstacle> mObstacles;
     private List<Missile> mMissiles;
 
+    // Boolean pour définir des états
     private boolean tankAlreadyOnObstacle = false;
     private boolean alreadyShowEndGame = false;
 
+    // Variables pour le temps
     private long lastTimeObstacle = 0;
     private long lastRocketFired;
     private long startGameTime;
 
+    // Couleurs utilisé pour le canvas
     private Paint paintWhite;
     private Paint paintRed;
 
+    // Score du joueur
     private int score = 0;
+    // Evite de remettre le tank au centre si le onWindowFocus est rappelé
     private boolean alreadyWindowFocus = false;
 
     public GameView(GameActivity context) {
         super(context);
         this.mContext = context;
 
+        // Récupération du sensor accéleromettre
         mAccelerometer = mContext.mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         // On récupère les données liés à l'écran
@@ -100,6 +108,7 @@ public class GameView extends FrameLayout implements SensorEventListener {
      * Créer un nouvelle obstacle
      */
     private void createNewObstacle() {
+        // Création de l'Obstacle
         Obstacle obstacle = new Obstacle(getContext());
         addView(obstacle, new ViewGroup.LayoutParams(110, 110));
 
@@ -202,11 +211,11 @@ public class GameView extends FrameLayout implements SensorEventListener {
         boolean touchObstacle = moveObstacleAndCheckCollision();
 
         // Affiche le score en haut à gauche de l'écran
-        canvas.drawText("Score: " + score, 10, 60, paintWhite);
+        canvas.drawText(mContext.getString(R.string.game_score) + score, 10, 60, paintWhite);
         // Récupère le temps de jeu actuel
         int gameDuration = Math.round((now - startGameTime) / 1000);
         // Affiche le temps de jeu en dessous du score
-        canvas.drawText("Time: " + gameDuration + "sec", 10, 130, paintWhite);
+        canvas.drawText(mContext.getString(R.string.game_time) + gameDuration + "sec", 10, 130, paintWhite);
 
         // Si le tank touche un obstacle et que l'on a pas déjà afficher le gameover
         if ((tankAlreadyOnObstacle || touchObstacle) && !alreadyShowEndGame) {
@@ -225,6 +234,8 @@ public class GameView extends FrameLayout implements SensorEventListener {
                 lastTimeObstacle = now;
             }
 
+            // Affichage d'un rectangle blanc au dessus du tank
+            // ProgressBar pleine
             canvas.drawRect(
                     mTank.mPosX + 35,
                     mTank.mPosY - 55,
@@ -232,12 +243,12 @@ public class GameView extends FrameLayout implements SensorEventListener {
                     mTank.mPosY - 40,
                     paintWhite);
 
+            // Récupération du temps entre maitenant et le dernier missile tiré
             long deltaTimeRocket = now - lastRocketFired;
-            if(deltaTimeRocket > 1500)
+            if(deltaTimeRocket > 1500) // On fait en sorte que le maximum soit 1500ms
                 deltaTimeRocket = 1500;
 
-            Log.e("TEST", deltaTimeRocket + " / " + ((float) deltaTimeRocket / 1500f) + "");
-
+            // On dessine la barre de chargement du missile en fonction du dernier tir
             canvas.drawRect(
                     mTank.mPosX + 35,
                     mTank.mPosY - 55,
@@ -348,6 +359,7 @@ public class GameView extends FrameLayout implements SensorEventListener {
      * @param newDegree Nouvelle valeur en degré
      */
     public void updateTankOrientation(float oldDegree, float newDegree) {
+        //Création d'une animation pour faire rotate le tank
         RotateAnimation rotateAnimation = new RotateAnimation(
                 oldDegree,
                 newDegree,
@@ -360,7 +372,8 @@ public class GameView extends FrameLayout implements SensorEventListener {
 
     /**
      * Vérifie si le Tank touche un obstacle
-     * Utilisation de l'algorithme
+     * Utilisation d'un algo qui compare un rectangle et un cercle
+     * Prend en compte l'angle du rectangle (soit de notre Tank)
      * @param obstacle Obstacle à vérifier
      * @return boolean - Le tank touche ou pas l'obstacle
      */
@@ -368,7 +381,7 @@ public class GameView extends FrameLayout implements SensorEventListener {
         // Rotate circle's center point back
         float obstacleCenterX = obstacle.mPosX + obstacle.getWidth() / 2;
         float obstacleCenterY = obstacle.mPosY + obstacle.getHeight() / 2;
-
+        // Calcule du centre du tank
         float tankCenterX = mTank.mPosX + mTank.getWidth() / 2;
         float tankCenterY = mTank.mPosY + mTank.getHeight() / 2;
 
@@ -396,6 +409,8 @@ public class GameView extends FrameLayout implements SensorEventListener {
         else
             closestY = unrotatedCircleY;
 
+        // Si la distance entre le rectangle et l'obstacle est inférieur au rayon de laobstacle
+        // c'est qu'il y a collision
         double distance = findDistance(unrotatedCircleX, unrotatedCircleY, closestX, closestY);
         if (distance < obstacle.getWidth() / 2) {
             tankAlreadyOnObstacle = true;

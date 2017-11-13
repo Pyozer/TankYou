@@ -59,17 +59,20 @@ public class GameActivity extends BaseActivity {
 
         prefUserManager = new PrefUserManager(this);
 
+        // Création des paramètres pour le sons
         AudioAttributes attrs = new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_GAME)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .build();
 
+        // Création de la gestion des sons
         soundPool = new SoundPool.Builder()
                 .setMaxStreams(10)
                 .setAudioAttributes(attrs)
                 .build();
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
+        // Définition des sons
         soundIds = new int[3];
         soundIds[0] = soundPool.load(this, R.raw.sf_explosion_01, 1);
         soundIds[1] = soundPool.load(this, R.raw.sf_canon_01, 1);
@@ -105,11 +108,11 @@ public class GameActivity extends BaseActivity {
         View view = LayoutInflater.from(this).inflate(R.layout.end_game_dialog, null);
 
         TextView textScore = view.findViewById(R.id.end_game_score);
-        String scoreDisplay = "SCORE\n" + score;
+        String scoreDisplay = getString(R.string.score) + "\n" + score;
         textScore.setText(scoreDisplay);
 
         TextView textDuration = view.findViewById(R.id.end_game_duration);
-        String durationDisplay = "DURÉE\n" + time + "sec";
+        String durationDisplay = getString(R.string.duree) + "\n" + time + "sec";
         textDuration.setText(durationDisplay);
 
         view.findViewById(R.id.end_game_retry).setOnClickListener(new View.OnClickListener() {

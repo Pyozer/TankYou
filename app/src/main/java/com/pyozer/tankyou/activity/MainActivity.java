@@ -6,14 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 
 import com.pyozer.tankyou.R;
 import com.pyozer.tankyou.util.PrefUserManager;
@@ -69,6 +65,8 @@ public class MainActivity extends BaseActivity {
             askUsername();
         }
 
+        // Charge le dialog lors de la création de l'activity
+        // Evite ainsi que le Dialog charge quand on en a besoin
         loadRulesDialog();
     }
 
@@ -85,7 +83,7 @@ public class MainActivity extends BaseActivity {
         // Spécifie on dialog notre vue
         builder.setView(viewInflated);
 
-        builder.setPositiveButton("Enregistrer", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(getString(R.string.save), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {}
         });
