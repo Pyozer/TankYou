@@ -9,6 +9,8 @@ public class Tank extends Objet {
 
     // Orientation du tank
     public float mDegre = 0;
+    // Vie du tank
+    private int vie = 3;
 
     public Tank(Context context) {
         super(context);
@@ -24,6 +26,28 @@ public class Tank extends Objet {
 
         mPosX += Math.cos(Math.toRadians(mDegre)) * sy;
         mPosY += Math.sin(Math.toRadians(mDegre)) * sy;
+    }
+
+    /**
+     * Vérifie si le tank est toujours en vie.
+     * @return En vie ou non
+     */
+    public boolean isAlive() {
+        return vie > 0;
+    }
+
+    /**
+     * Renvoi le nombre de vie du tank
+     */
+    public int getVie() {
+        return vie;
+    }
+
+    /**
+     * Indique que le tank a touché un obstacle et donc perd une vie.
+     */
+    public void touchObstacle() {
+        vie--;
     }
 
     /**

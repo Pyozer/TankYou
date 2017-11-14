@@ -1,6 +1,8 @@
 package com.pyozer.tankyou.activity;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -39,13 +41,26 @@ public class StatsActivity extends BaseScoreActivity {
      * Reset les scores de l'utilisateur
      */
     private void resetScores() {
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-
-        mDatabase.child("scores").child(prefUserManager.getUsername()).removeValue();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.reset_score_title))
+                .setMessage(getString(R.string.reset_score_text))
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                        mDatabase.child("scores").child(prefUserManager.getUsername()).removeValue();
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                    }
+                })
+                .show();
     }
 
     /**
      * Défini la requete Firebase pour récupérer les scores du joueur
+     *
      * @return Query
      */
     @Override

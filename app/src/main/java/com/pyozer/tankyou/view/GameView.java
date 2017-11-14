@@ -14,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.animation.RotateAnimation;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.pyozer.tankyou.R;
 import com.pyozer.tankyou.activity.GameActivity;
@@ -46,10 +47,12 @@ public class GameView extends FrameLayout implements SensorEventListener {
     private Tank mTank;
     private List<Obstacle> mObstacles;
     private List<Missile> mMissiles;
+    private ImageView mVie;
 
     // Boolean pour définir des états
     private boolean tankAlreadyOnObstacle = false;
     private boolean alreadyShowEndGame = false;
+    private boolean hasAlreadyRemoveLife = false;
 
     // Variables pour le temps
     private long lastTimeObstacle = 0;
@@ -86,6 +89,10 @@ public class GameView extends FrameLayout implements SensorEventListener {
         // On créer notre liste d'Obstacle et de Missile
         mObstacles = new ArrayList<>();
         mMissiles = new ArrayList<>();
+
+        // Définition de la barre de vie
+        mVie = new ImageView(mContext);
+        addView(mVie, new ViewGroup.LayoutParams(280, 75));
 
         BitmapFactory.Options opts = new BitmapFactory.Options();
         opts.inDither = true;
@@ -156,6 +163,10 @@ public class GameView extends FrameLayout implements SensorEventListener {
             mTank.setY(mVerticalMax / 2 - mTank.getHeight() / 2);
 
             mTank.setBackgroundResource(R.drawable.tanks_sprites_blue);
+
+            mVie.setX(mHorizontalMax - mVie.getWidth() - 20);
+            mVie.setY(20);
+            mVie.setBackgroundResource(R.drawable.vie_3);
         }
     }
 
@@ -197,8 +208,6 @@ public class GameView extends FrameLayout implements SensorEventListener {
         return true;
     }
 
-    private int widthBar = 0;
-
     @Override
     protected void onDraw(Canvas canvas) {
         if (alreadyShowEndGame)
@@ -210,6 +219,21 @@ public class GameView extends FrameLayout implements SensorEventListener {
         // Déplace les obstacles et vérifie les collisions (entre le tank et les missiles)
         boolean touchObstacle = moveObstacleAndCheckCollision();
 
+        if(touchObstacle && !hasAlreadyRemoveLife) {
+            mTank.touchObstacle();
+            hasAlreadyRemoveLife = true;
+        } else if(!touchObstacle)
+            hasAlreadyRemoveLife = false;
+
+        if(mTank.getVie() == 3)
+            mVie.setBackgroundResource(R.drawable.vie_3);
+        else if(mTank.getVie() == 2)
+            mVie.setBackgroundResource(R.drawable.vie_2);
+        else if(mTank.getVie() == 1)
+            mVie.setBackgroundResource(R.drawable.vie_1);
+        else
+            mVie.setBackgroundResource(R.drawable.vie_0);
+
         // Affiche le score en haut à gauche de l'écran
         canvas.drawText(mContext.getString(R.string.game_score) + score, 10, 60, paintWhite);
         // Récupère le temps de jeu actuel
@@ -218,7 +242,10 @@ public class GameView extends FrameLayout implements SensorEventListener {
         canvas.drawText(mContext.getString(R.string.game_time) + gameDuration + "sec", 10, 130, paintWhite);
 
         // Si le tank touche un obstacle et que l'on a pas déjà afficher le gameover
-        if ((tankAlreadyOnObstacle || touchObstacle) && !alreadyShowEndGame) {
+        if(!mTank.isAlive() && (tankAlreadyOnObstacle || touchObstacle) && !alreadyShowEndGame) {
+            tankTouchObstacle(gameDuration);
+        }
+        if (!mTank.isAlive() && (tankAlreadyOnObstacle || touchObstacle) && !alreadyShowEndGame) {
             tankTouchObstacle(gameDuration);
         } else {
             // Défini la rotation actuelle du tank
@@ -306,8 +333,11 @@ public class GameView extends FrameLayout implements SensorEventListener {
             } else {
                 // On vérifie si le tank est sur l'obstacle en question
                 touchObstacle = isTankOnObstacle(obstacle);
-                if (touchObstacle) // Si c'est le cas ou quitte la boucle
+                if (touchObstacle) { // Si c'est le cas ou quitte la boucle
+                    removeView(obstacle);
+                    iteratorObstacle.remove();
                     break;
+                }
                 if(checkMissileCollision(obstacle)) {
                     removeView(obstacle);
                     iteratorObstacle.remove();

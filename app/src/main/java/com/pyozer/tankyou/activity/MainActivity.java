@@ -124,7 +124,7 @@ public class MainActivity extends BaseActivity {
                 "Pour avancer il suffit de pencher son téléphone en avant ou en arrière. Pour tourner à gauche ou à droite il faut pencher le téléphone sur le côté<br /><br />" +
                 "Vous avez la possibilité avec votre tank de <strong>tirer des missiles</strong> pour détruire des obstacles.<br />" +
                 "Entre chaque tire, il y un temps d'attente de <strong>1.5sec</strong> durant laquel le tank recharge son missile.<br /><br />" +
-                "A chaque obstacle détruit vous gagnez <strong>un point</strong>. Si vous touchez un obstacle, vous perdez la partie.</p></body></html>";
+                "A chaque obstacle détruit vous gagnez <strong>un point</strong>. Vous avez 3 points de vie, si vous touchez 3 fois un obstacle, vous perdez la partie.</p></body></html>";
 
         // Créer notre webview
         WebView mWebView = viewRulesDialog.findViewById(R.id.rules_text);

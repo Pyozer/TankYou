@@ -71,6 +71,8 @@ public class GameActivity extends BaseActivity {
                 .setAudioAttributes(attrs)
                 .build();
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        soundPool.autoPause();
+        soundPool.autoResume();
 
         // Définition des sons
         soundIds = new int[3];

@@ -40,4 +40,6 @@
     <string name="save">Enregistrer</string>
     <string name="game_score">Score:</string>
     <string name="game_time">Temps:</string>
+    <string name="reset_score_title">Suppression</string>
+    <string name="reset_score_text">Voulez-vous vraiment supprimer vos scores ?</string>
 </resources>
