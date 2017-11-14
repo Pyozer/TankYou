@@ -42,4 +42,17 @@
     <string name="game_time">Temps:</string>
     <string name="reset_score_title">Suppression</string>
     <string name="reset_score_text">Voulez-vous vraiment supprimer vos scores ?</string>
+
+    <string name="rules_html">
+        <![CDATA[
+            <html><head><style>p {color: #ffffff; font-size: 20px; text-align: justify;}</style></head><body>
+                <p>Le but est de contrôler un <strong>tank</strong> <img src="tanks_sprites_blue.png" width="45" /> et d\'éviter les <strong>obstacles</strong> <img src="obstacle.png" width="25" /> qui se déplacent sur l\'écran.</p>
+                <p>Le jeu se joue grâce à l\'<strong>accéléromètre</strong> pour pouvoir se déplacer.<br />
+                Pour avancer il suffit de pencher son téléphone en avant ou en arrière. Pour tourner à gauche ou à droite il faut pencher le téléphone sur le côté<br /><br />
+                Vous avez la possibilité avec votre tank de <strong>tirer des missiles</strong> <img src="missile.png" width="20" /> pour détruire des obstacles.<br /><br />
+                Entre chaque tire, il y un temps d\'attente de <strong>1.5sec</strong> durant laquel le tank recharge son missile.<br /><br />
+                A chaque obstacle détruit vous gagnez <strong>un point</strong>. Vous avez 3 points de vie <img src="vie_3.png" width="65" />, si vous touchez 3 fois un obstacle, vous perdez la partie.</p></body></html>
+
+        ]]>
+    </string>
 </resources>

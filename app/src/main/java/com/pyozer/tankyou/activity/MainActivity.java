@@ -31,7 +31,6 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, GameActivity.class));
-                finish();
             }
         });
         findViewById(R.id.scores).setOnClickListener(new View.OnClickListener() {
@@ -117,18 +116,12 @@ public class MainActivity extends BaseActivity {
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
         View viewRulesDialog = inflater.inflate(R.layout.rules_dialog, null);
         dialogRules.setContentView(viewRulesDialog);
-        // Règles du jeu (HTML)
-        String rules_text = "<html><head><style>p {color: #ffffff; font-size: 20px; text-align: justify;}</style></head><body>" +
-                "<p>Le but est de contrôler un <strong>tank</strong> et d'éviter les <strong>obstacles</strong> qui se déplacent sur l'écran.<br /><br />" +
-                "Le jeu se joue grâce à l'<strong>accéléromètre</strong> pour pouvoir se déplacer.<br />" +
-                "Pour avancer il suffit de pencher son téléphone en avant ou en arrière. Pour tourner à gauche ou à droite il faut pencher le téléphone sur le côté<br /><br />" +
-                "Vous avez la possibilité avec votre tank de <strong>tirer des missiles</strong> pour détruire des obstacles.<br />" +
-                "Entre chaque tire, il y un temps d'attente de <strong>1.5sec</strong> durant laquel le tank recharge son missile.<br /><br />" +
-                "A chaque obstacle détruit vous gagnez <strong>un point</strong>. Vous avez 3 points de vie, si vous touchez 3 fois un obstacle, vous perdez la partie.</p></body></html>";
 
+        // Règles du jeu (HTML)
+        String rules_text = getString(R.string.rules_html);
         // Créer notre webview
         WebView mWebView = viewRulesDialog.findViewById(R.id.rules_text);
-        mWebView.loadData(rules_text, "text/html; charset=UTF-8;", null);
+        mWebView.loadDataWithBaseURL("file:///android_res/drawable/", rules_text, "text/html; charset=UTF-8;", null, null);
         mWebView.setBackgroundColor(getResources().getColor(android.R.color.transparent));
 
         viewRulesDialog.findViewById(R.id.rules_back).setOnClickListener(new View.OnClickListener() {

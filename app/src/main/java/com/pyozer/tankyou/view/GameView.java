@@ -177,9 +177,9 @@ public class GameView extends FrameLayout implements SensorEventListener {
 
             // On fait avancer ou reculer le Tank si l'inclisaison en avant ou arrière
             // est supérieur a une certaine valeur
-            if (mSensorY > 1.1)
+            if (mSensorY > 1.35)
                 mSensorY = 6.5f;
-            else if (mSensorY < -1.6)
+            else if (mSensorY < -1.8)
                 mSensorY = -6.5f;
             else
                 mSensorY = 0;
@@ -225,6 +225,7 @@ public class GameView extends FrameLayout implements SensorEventListener {
         } else if(!touchObstacle)
             hasAlreadyRemoveLife = false;
 
+        // Affiche la vie sur le jeu
         if(mTank.getVie() == 3)
             mVie.setBackgroundResource(R.drawable.vie_3);
         else if(mTank.getVie() == 2)
@@ -239,7 +240,7 @@ public class GameView extends FrameLayout implements SensorEventListener {
         // Récupère le temps de jeu actuel
         int gameDuration = Math.round((now - startGameTime) / 1000);
         // Affiche le temps de jeu en dessous du score
-        canvas.drawText(mContext.getString(R.string.game_time) + gameDuration + "sec", 10, 130, paintWhite);
+        canvas.drawText(mContext.getString(R.string.game_time) + gameDuration, 10, 130, paintWhite);
 
         // Si le tank touche un obstacle et que l'on a pas déjà afficher le gameover
         if(!mTank.isAlive() && (tankAlreadyOnObstacle || touchObstacle) && !alreadyShowEndGame) {
